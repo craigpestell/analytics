@@ -44,6 +44,6 @@
     "lodash": "^4.17.4"
   },
   "dependencies": {
-    "@component/common": "^1.0.0"
+    "@component/common": "^1.237.0"
   }
 }

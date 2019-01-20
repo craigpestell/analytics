@@ -13,17 +13,34 @@ describe('Analytics', () => {
   });
 });
 
-describe('Analytics tags with no configuration', () => {
+describe('Analytics instantiated with no configuration', () => {
+  let analytics;
   beforeEach(() => {
     loadFixtures('main.html'); // fixtures/html/main.html becomes your DOM
     data = getJSONFixture('analytics.json');
+    analytics = new Analytics();
   });
 
-  it('should instantiate Analytics object with no parameters', () => {
-    const analytics = new Analytics();
-    expect(typeof analytics).toEqual("object");   
-    expect(typeof analytics.bootstrapAnalyticsTagging).toEqual("function");
+  it('should return Analytics module with addEventListeners method', () => {
+    expect(typeof analytics).toEqual("object");
+    expect(typeof analytics.addEventListeners).toEqual("function");
   })
 
+  describe('addEventListeners for default Analytics configuration', () => {
+    it('called with no parameters should add default event listeners', () => {
 
+      const fireTagSpy = spyOn(Analytics.prototype, 'fireTag');
+
+      analytics.addEventListeners();    
+      const html = document.querySelector('html');
+      
+      expect(html.analytics).toBeDefined();
+      expect(fireTagSpy).toHaveBeenCalled();
+      console.log('analytics: ', html.analytics);
+      console.log('fireTagSpy: ', fireTagSpy);
+    });
+  
+  })
+  
 });
+

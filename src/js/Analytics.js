@@ -61,14 +61,13 @@ class Analytics {
     get taggedElements() {
         let elList = [];
         this.tagMeta.forEach((item) => {
-            console.log('item.selector: ', item.selector);
             const thisElList = (item.selectorIsId) ? [document.getElementById(item.selector)] : document.querySelectorAll(item.selector);
             const elListArr = Array.from(thisElList);
             if (thisElList && elListArr.length) {
                 elList = elList.length ? elList.concat(elListArr) : elListArr;
             }
         });
-        console.log('elList:', elList);
+
         const filtered = elList.filter(function notNull(el) {
                 return el != null;
             });
@@ -99,8 +98,6 @@ class Analytics {
         }
         return defaultHandler;
     }
-
-
     
     addEventListeners (getAnalyticsData){
         const fetchData = getAnalyticsData || this.getFetchHandlerForAnalyticsEntity;
@@ -113,70 +110,12 @@ class Analytics {
         const fireViewEventTag = (config) => {
             const {data = {}} = config;
             getAnalyticsDataForElement(Object.values(config.data)).then((result) => {
-
                 Analytics.prototype.fireTag('view', {_analytics: result});
             }, (reason) => {
                 console.error('rejection reason: ', reason);
             })
-
         }
 
-        const getClickEventTagListener = (config) => {
-
-            return function clickListener(e) {
-
-                let navigateToHref = false;
-                if(e.currentTarget.href){
-                    e.preventDefault() // for testing
-                    navigateToHref = true;
-                }
-
-                
-                
-                async function fetchAnalytics(fetchDataPromises) {
-                    let result = [];
-                    for (let i = 0; i < fetchDataPromises.length; i++){
-                        let r = await fetchDataPromises[i](e);
-                        result.push(r);
-                    }
-                    return {_analytics: result};
-                }
-
-                fetchAnalytics(Object.values(config.data || {})).then((result) => {
-                    Analytics.prototype.fireTag('link', result);
-                    if( navigateToHref ) {
-                        window.location.href = e.target.closest('a').href;
-                    }
-                    return true;
-                }, (reason) => {
-                    console.error('Analytics data fetch failed.  Rejection reason: ', reason);
-                })
-
-            };
-        }
-
-        function getImpressionEventTagListener(config) {
-            return (e) => {
-                async function fetchAnalytics(fetchDataPromises) {
-                    let result = [];
-                    for (let i = 0; i < fetchDataPromises.length; i++){
-                        let r = await fetchDataPromises[i](e);
-                        result.push(r);
-                    }
-                    return {_analytics: result};
-                }
-
-                fetchAnalytics(Object.values(config.data || {})).then((result) => {
-                    result._analytics.impression = true;
-                    Analytics.prototype.fireTag('link', result);
-                    window.location.href = e.target.closest('a').href;
-                }, (reason) => {
-                    console.error('Analytics data fetch failed.  Rejection reason: ', reason);
-                })
-
-            };
-        }
-        
         this.tagMeta.forEach((item) => {
             const applicableElements = (item.selectorIsId) ? [document.getElementById(item.selector)] : document.querySelectorAll(item.selector);            
             const filteredEls = Array.from(applicableElements).filter(function notNull(el) {
@@ -213,14 +152,13 @@ class Analytics {
             }
 
             if (events.link) {
-                const clickListener = getClickEventTagListener(el.analytics);
-                console.log(clickListener);
-
+                const clickListener = Analytics.prototype.getClickEventTagListener(el.analytics);
+                
                 el.addEventListener('click', clickListener);
             }
 
             if (events.impression) {
-                const impressionListener = getImpressionEventTagListener(el.analytics);
+                const impressionListener = Analytics.prototype.getImpressionEventTagListener(el.analytics);
                 el.addEventListener('observed', impressionListener);
                 intersectionObserver.observe(el);
             }
@@ -228,8 +166,58 @@ class Analytics {
     };
 }
 
-Analytics.staticProperty = 'a static property';
-Analytics.prototype.protoProperty = 'a prototype property';
+Analytics.prototype.getClickEventTagListener = (config) => {
+    return function clickListener(e) {
+
+        let navigateToHref = false;
+        if(e.currentTarget.href){
+            e.preventDefault() // don't allow address location change until tags fire.
+            navigateToHref = true;
+        }
+        
+        async function fetchAnalytics(fetchDataPromises) {
+            let result = [];
+            for (let i = 0; i < fetchDataPromises.length; i++){
+                let r = await fetchDataPromises[i](e);
+                result.push(r);
+            }
+            return {_analytics: result};
+        }
+
+        fetchAnalytics(Object.values(config.data || {})).then((result) => {
+            Analytics.prototype.fireTag('link', result);
+            if( navigateToHref ) {
+                window.location.href = e.target.closest('a').href;
+            }
+            return true;
+        }, (reason) => {
+            console.error('Analytics data fetch failed.  Rejection reason: ', reason);
+        })
+
+    };
+}
+
+Analytics.prototype.getImpressionEventTagListener = (config) => {
+    return (e) => {
+        async function fetchAnalytics(fetchDataPromises) {
+            let result = [];
+            for (let i = 0; i < fetchDataPromises.length; i++){
+                let r = await fetchDataPromises[i](e);
+                result.push(r);
+            }
+            return {_analytics: result};
+        }
+
+        fetchAnalytics(Object.values(config.data || {})).then((result) => {
+            result._analytics.impression = true;
+            Analytics.prototype.fireTag('link', result);
+            window.location.href = e.target.closest('a').href;
+        }, (reason) => {
+            console.error('Analytics data fetch failed.  Rejection reason: ', reason);
+        })
+    };
+}
+
 Analytics.prototype.fireTag = (type, data) => {
     console.log(`#### ANALYTICS: firing "${type}" tag with data:`, data);
     TagManagerUtil.fireTag(type, data);

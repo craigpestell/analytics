@@ -1,3 +1,4 @@
 import Analytics from './js/Analytics';
+import AnalyticsValidator from './js/AnalyticsValidator';
 
-module.exports = Analytics;
+module.exports = {Analytics, AnalyticsValidator}

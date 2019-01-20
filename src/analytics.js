@@ -1,3 +1,3 @@
-import AnalyticsBootstrap from './js/AnalyticsBootstrap';
+import Analytics from './js/Analytics';
 
-module.exports = { AnalyticsBootstrap };
+module.exports = Analytics;

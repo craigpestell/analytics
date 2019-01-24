@@ -5,13 +5,13 @@
 import { validate, ParameterValidationError } from 'parameter-validator';
 
 class AnalyticsValidator {
-    constructor(options) {
-        try {
-            const { elements } = validate(options, ['elements']);
-        } catch (error) {
-            if (error instanceof ParameterValidationError) {
-                console.log(error.message);
-            }
-        }
+  constructor(options) {
+    try {
+      const { elements } = validate(options, ['elements']);
+    } catch (error) {
+      if (error instanceof ParameterValidationError) {
+        console.log(error.message);
+      }
     }
+  }
 }

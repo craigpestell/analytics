@@ -1,4 +1,4 @@
-import Analytics from '../src/analytics';
+import { Analytics } from '../src/analytics';
 
 import analyticsConfig from './analytics.config';
 
@@ -9,7 +9,7 @@ describe('Analytics', () => {
   });
 
   it('should have Analytics module', () => {
-    expect(typeof Analytics).toEqual("function");
+    expect(typeof Analytics).toEqual('function');
   });
 });
 
@@ -22,25 +22,23 @@ describe('Analytics instantiated with no configuration', () => {
   });
 
   it('should return Analytics module with addEventListeners method', () => {
-    expect(typeof analytics).toEqual("object");
-    expect(typeof analytics.addEventListeners).toEqual("function");
-  })
+    expect(typeof analytics).toEqual('object');
+    expect(typeof analytics.addEventListeners).toEqual('function');
+  });
 
   describe('addEventListeners for default Analytics configuration', () => {
-    it('called with no parameters should add default event listeners', () => {
-
-      const fireTagSpy = spyOn(Analytics.prototype, 'fireTag');
-
-      analytics.addEventListeners();    
-      const html = document.querySelector('html');
-      
-      expect(html.analytics).toBeDefined();
-      expect(fireTagSpy).toHaveBeenCalled();
-      console.log('analytics: ', html.analytics);
-      console.log('fireTagSpy: ', fireTagSpy);
+    fit('called with no parameters should add default event listeners', (done) => {
+      spyOn(Analytics, 'fireTag');
+      console.log('Analytics.fireTag: ', Analytics.fireTag);
+      analytics.addEventListeners()
+        .then(() => {
+          const html = document.querySelector('html');
+          console.log('analytics: ', html.analytics);
+          expect(html.analytics).toBeDefined();
+          expect(Analytics.fireTag).toHaveBeenCalled();
+          done();
+        });
     });
-  
-  })
-  
+  });
 });
 

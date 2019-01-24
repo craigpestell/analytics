@@ -11,12 +11,12 @@ import Component from './src/analytics';
 const App = {
   start() {
     const component = new Component('#analytics-main', {
-      opt: 'val'
+      opt: 'val',
     });
     // eslint-disable-next-line no-console
     console.log(component.view.model.toJSON());
 
-    component.on('something:done', result => {
+    component.on('something:done', (result) => {
       // eslint-disable-next-line no-console
       console.log('result is', result);
     });

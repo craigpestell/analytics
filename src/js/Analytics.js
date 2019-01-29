@@ -1,4 +1,5 @@
 import { validate, ParameterValidationError } from 'parameter-validator';
+import Promise from 'prfun'; // subclasses global.Promise
 import TagManagerUtil from '@component/common/src/util/TagManagerUtil';
 import defaultConfig from './config/config.default';
 import AnalyticsService from './AnalyticsService';
@@ -248,13 +249,16 @@ class Analytics {
 
   addEventListeners(analyticsDataMap) {
     // const getAnalyticsDataForElement = (dataHashMap) => (Promise.all(dataHashMap.map((p) => (resolvedDataMap(p)))))
-    async function getAnalyticsDataForElement (dataHashMap) {
+    const getAnalyticsDataForElement = (dataHashMap) => {
       console.log('dataHashMap:', dataHashMap);
-      let d = await Promise.all(Object.keys(dataHashMap).map((entity) => {
-        return { [entity]: analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])}
-      }))
-      console.log('d: ', d);
-      return d;
+      // return Promise.props(dataHashMap)
+      let combinedDataHashMap = {};
+      Object.entries(dataHashMap).map((entry) => {
+        const entity = entry[0];
+        combinedDataHashMap[entity] = analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])
+      });
+
+      return Promise.props(combinedDataHashMap)
     }
 
 

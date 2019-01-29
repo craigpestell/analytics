@@ -2,7 +2,7 @@ module.exports = {
   page: {
     options: {},
   },
-  elements: [
+  tagMeta: [
     {
       selector: 'html',
       events: { view: { event_name: 'test' } },

@@ -1,7 +1,7 @@
 import { validate, ParameterValidationError } from 'parameter-validator';
 import TagManagerUtil from '@component/common/src/util/TagManagerUtil';
 import defaultConfig from './config/config.default';
-
+import AnalyticsService from './AnalyticsService';
 
 /*
 // tag configuration
@@ -50,7 +50,7 @@ class Analytics {
 
     this.tagMeta = config.tagMeta;
 
-    this.getFetchHandlerForAnalyticsEntity = this.getFetchHandlerForAnalyticsEntity.bind(this);
+    this.defaultAnalyticsDataMap = this.defaultAnalyticsDataMap.bind(this);
 
     const observedEvent = new Event('observed');
 
@@ -90,7 +90,7 @@ class Analytics {
    * DOMElements matched by configuration CSS selectors.
    * 
    * @returns {Set<DOMElement>} Elements tagged, matched by CSS selectors in config.
-   */ 
+   */
   get taggedElements() {
     let elList = [];
     this.tagMeta.forEach((item) => {
@@ -109,7 +109,11 @@ class Analytics {
    * Handler used to fetch data for Analytics entity.  Can be overwritten by configuration.
    * @param {Object} entity - entity to fetch data for. 
    */
-  getFetchHandlerForAnalyticsEntity(entity) {
+  defaultAnalyticsDataMap(entity) {
+    
+    if(AnalyticsService[entity.name]) {
+      return AnalyticsService[entity.name](); 
+    }
     const defaultHandler = (e) => {
       const data = { event_name: 'generic' };
       return new Promise((resolve) => { resolve(Object.assign(e.currentTarget.analytics, data)); });
@@ -121,6 +125,15 @@ class Analytics {
       return this.tagMeta[0].data.page(); // hack!!!
     }
 
+    /* if (entity.name === 'experiment') {
+      //ExperimentSDK.getAllSelectedRecipes().always( function ( recipes ) { 
+      return new Promise((resolve) => {
+        ExperimentSDK.getAllSelectedRecipes().always(function (recipes) {
+          resolve(recipes);
+        });
+      })
+    } */
+
     // default product entity handler.
     if (entity.name === 'product') {
       const fetchProduct = (e) => {
@@ -131,17 +144,23 @@ class Analytics {
       };
       return fetchProduct;
     }
+    
     return defaultHandler;
   };
 
-  static getClickEventTagListener (config) {
-      return function clickListener(e) {
+  /**
+   * spyOn().and.returnValue(false) in tests to not redirect browser during debugging.
+   */
+  static get navigateToHref() { return true; }
+
+  static getClickEventTagListener(config) {
+    return function clickListener(e) {
       let navigateToHref = false;
       if (e.currentTarget.href) {
         e.preventDefault(); // don't allow address location change until tags fire.
-        navigateToHref = true;
+        navigateToHref = Analytics.navigateToHref;
       }
-    
+
       async function fetchAnalytics(fetchDataPromises) {
         const result = [];
         for (let i = 0; i < fetchDataPromises.length; i++) {
@@ -150,7 +169,7 @@ class Analytics {
         }
         return { _analytics: result };
       }
-    
+
       fetchAnalytics(Object.values(config.data || {})).then((result) => {
         Analytics.fireTag('link', result);
         if (navigateToHref) {
@@ -162,8 +181,8 @@ class Analytics {
       });
     }
   };
-  
-  static getImpressionEventTagListener (config) {
+
+  static getImpressionEventTagListener(config) {
     return (e) => {
       async function fetchAnalytics(fetchDataPromises) {
         const result = [];
@@ -173,7 +192,7 @@ class Analytics {
         }
         return { _analytics: result };
       }
-    
+
       fetchAnalytics(Object.values(config.data || {})).then((result) => {
         result._analytics.impression = true;
         Analytics.fireTag('link', result);
@@ -183,7 +202,7 @@ class Analytics {
       });
     }
   };
-  
+
   /** 
    * Validate individual tag configuration.
    * 
@@ -199,10 +218,10 @@ class Analytics {
    * 
    * @returns {?Object} validated configuration
    */
-  static validateTagConfig (config) {
+  static validateTagConfig(config) {
     try {
       // Each config must have a css selector ('html' for page, 'a' for all anchors, etc) and an events object.
-      
+
       return { selector, events } = validate(config, ['selector', 'events']);
     } catch (error) {
       if (error instanceof ParameterValidationError) {
@@ -211,13 +230,13 @@ class Analytics {
       }
     }
   };
-  
+
   /**
    * Validate analytics config array.
    * @param {?Array} tagMeta - Array of tag configurations to validate.
    * @returns {boolean} - true if tagMeta configuration is valid, false otherwise.
    */
-  static validateTagMeta (tagMeta) {
+  static validateTagMeta(tagMeta) {
     if (!tagMeta) {
       return false;
     }
@@ -227,22 +246,32 @@ class Analytics {
     return true;
   };
 
-  addEventListeners(getAnalyticsData) {
-    const fetchData = getAnalyticsData || this.getFetchHandlerForAnalyticsEntity;
-    const getAnalyticsDataForElement = dataConfig => (Promise.all(dataConfig.map(p => fetchData(p))));
+  addEventListeners(analyticsDataMap) {
+    // const getAnalyticsDataForElement = (dataHashMap) => (Promise.all(dataHashMap.map((p) => (resolvedDataMap(p)))))
+    async function getAnalyticsDataForElement (dataHashMap) {
+      console.log('dataHashMap:', dataHashMap);
+      let d = await Promise.all(Object.keys(dataHashMap).map((entity) => {
+        return { [entity]: analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])}
+      }))
+      console.log('d: ', d);
+      return d;
+    }
+
 
     const fireViewEventTag = (config) => {
-      const { data = {} } = config;
-      const viewTagPromise = getAnalyticsDataForElement(Object.values(data)).then((result) => {
-        console.log('calling Analytics.fireTag', Analytics.fireTag);
-        Analytics.fireTag('view', { _analytics: result });
 
-        console.log('After firing tag...');
+      let { data = {} } = config;
+
+      const viewTagPromise = getAnalyticsDataForElement(data).then((result) => {
+        let utagData = {}; // TODO: maybe add static defaults?
+        Object.assign(utagData, result);
+        Analytics.fireTag('view', { _analytics: utagData });
       }, (reason) => {
         console.error('rejection reason: ', reason);
       });
-      console.log('viewTagPromise: ', viewTagPromise);
+
       return viewTagPromise;
+
     };
 
     this.tagMeta.forEach((item) => {
@@ -266,6 +295,10 @@ class Analytics {
       });
     });
 
+
+
+    let viewTag = undefined;
+
     this.taggedElements.forEach((el) => {
       if (!el.analytics || !el.analytics.events) {
         return;
@@ -273,8 +306,7 @@ class Analytics {
       const { events } = el.analytics;
 
       if (events.view) {
-        console.log('calling fireViewEventTag');
-        fireViewEventTag(el.analytics);
+        viewTag = fireViewEventTag(el.analytics);
       }
 
       if (events.link) {
@@ -288,7 +320,10 @@ class Analytics {
         this.intersectionObserver.observe(el);
       }
     });
-    return new Promise((resolve) => { resolve(true); });
+
+    console.log('viewTag: ', viewTag);
+
+    return viewTag || new Promise((resolve) => { resolve(true) });
   }
 }
 

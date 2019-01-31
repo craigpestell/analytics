@@ -9,6 +9,6 @@ const experiment = _.memoize((page) => {
       })
 });
 
-export default module.exports = {
+export default {
     experiment:(page) => (experiment(page))
 }

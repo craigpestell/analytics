@@ -5,5 +5,5 @@ import AnalyticsValidator from './js/AnalyticsValidator';
  * @module @component/analytics
  * @see module:@component/analytics
  */
-module.exports = { Analytics, AnalyticsValidator };
-export default module.exports;
+
+export default { Analytics, AnalyticsValidator };;

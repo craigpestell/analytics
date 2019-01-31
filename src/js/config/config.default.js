@@ -1,6 +1,6 @@
 import AnalyticsService from '../AnalyticsService';
 import ExperimentSDK from '@component/experiment';
-module.exports = {
+export default {
   tagMeta: [
     // default page view tag.
     {

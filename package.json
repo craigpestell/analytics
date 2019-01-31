@@ -45,7 +45,8 @@
   },
   "dependencies": {
     "@component/common": "^1.237.0",
-    "@component/experiment": "^0.5.0",
+    "@component/experiment": "file:../experiment",
+    "analytics": "0.0.20",
     "parameter-validator": "^1.0.5",
     "prfun": "^2.1.5"
   }

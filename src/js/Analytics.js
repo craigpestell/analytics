@@ -1,9 +1,13 @@
+import Analytics from 'analytics';
+import TagDataPlugin from './analytics-plugin-tag-data';
+import TagManagerPlugin from './analytics-plugin-tag-manager';
 import { validate, ParameterValidationError } from 'parameter-validator';
 import Promise from 'prfun'; // subclasses global.Promise
-import TagManagerUtil from '@component/common/src/util/TagManagerUtil';
+
 import defaultConfig from './config/config.default';
 import AnalyticsService from './AnalyticsService';
 
+console.log('defaultConfig: ', defaultConfig);
 /*
 // tag configuration
 {
@@ -36,22 +40,27 @@ import AnalyticsService from './AnalyticsService';
  * Analytics
  * This class is used to add Analytics tracking events.
  */
-class Analytics {
+export default class AnalyticsController {
   /**
    * Create an analytics object.
    * @param {Object} [options=defaultConfig] Tag configuration.
    * @param {Array} [options.tagMeta] Tag configurations per CSS selector.
    */
-  constructor(options = defaultConfig) {
-    const config = options;
-    if (config) {
-      Object.assign(config, defaultConfig);
+  constructor(options) {
+    let config = options;
+    if (options && options.tagMeta) {
+      config.tagMeta = defaultConfig.tagMeta.concat(config.tagMeta);
+    }else{
+      config = defaultConfig;
     }
-    Analytics.validateTagMeta(config.tagMeta);
+    AnalyticsController.validateTagMeta(config.tagMeta);
 
     this.tagMeta = config.tagMeta;
 
     this.defaultAnalyticsDataMap = this.defaultAnalyticsDataMap.bind(this);
+    this.addEventListeners = this.addEventListeners.bind(this);
+    this.getClickEventTagListener = this.getClickEventTagListener.bind(this);
+    this.getImpressionEventTagListener = this.getImpressionEventTagListener.bind(this);
 
     const observedEvent = new Event('observed');
 
@@ -63,17 +72,32 @@ class Analytics {
       }
       entries[0].target.dispatchEvent(observedEvent);
     });
+
+    this.initAnalytics({debug: true});
   }
 
-  /**
-   * Fire the analytics tag.
-   * 
-   * @param {('view'|'link')} type - type of tag to fire.
-   * @param {Object} data - Data to send to Analytics vendor library.
-   */
-  static fireTag(type, data) {
-    console.log(`#### ANALYTICS: firing "${type}" tag with data:`, data);
-    TagManagerUtil.fireTag(type, data);
+  initAnalytics(options = {debug: false}) {
+    this.analytics = Analytics({
+      debug: options.debug,
+      app: 'digital-product-ui-bcom',
+      version: 100,
+      plugins: [
+        TagManagerPlugin({
+          env: 'dev', 
+          brand: 'bcom'
+        }),
+        TagDataPlugin
+      ]
+    })
+
+    /* if(options.debug) {
+      this.analytics.on('*', ({ payload }) => {
+        console.log(`* listener ${payload.type} with payload: ${JSON.stringify(payload.properties, null, '\t')}`)
+      })
+    }*/
+    this.analytics.on('*', ({ payload }) => {
+      console.log(`* listener ${payload.type} with payload: ${JSON.stringify(payload.properties, null, '\t')}`)
+    })
   }
 
   /**
@@ -83,7 +107,7 @@ class Analytics {
    * @param {Object} config - Tag configuration.
    */
   addTag(config) {
-    const { selector, events } = Analytics.validateTagConfig(config); // eslint-disable-line no-unused-vars
+    const { selector, events } = AnalyticsController.validateTagConfig(config); // eslint-disable-line no-unused-vars
     this.tagMeta.push(config);
   }
 
@@ -154,12 +178,14 @@ class Analytics {
    */
   static get navigateToHref() { return true; }
 
-  static getClickEventTagListener(config) {
+  getClickEventTagListener(config) {
+    const trackLink = this.analytics.track;
+
     return function clickListener(e) {
       let navigateToHref = false;
       if (e.currentTarget.href) {
         e.preventDefault(); // don't allow address location change until tags fire.
-        navigateToHref = Analytics.navigateToHref;
+        navigateToHref = AnalyticsController.navigateToHref;
       }
 
       async function fetchAnalytics(fetchDataPromises) {
@@ -168,11 +194,12 @@ class Analytics {
           const r = await fetchDataPromises[i](e);
           result.push(r);
         }
-        return { _analytics: result };
+        return result;
       }
 
       fetchAnalytics(Object.values(config.data || {})).then((result) => {
-        Analytics.fireTag('link', result);
+        trackLink(e.target.tagName + 'click', result);
+        // AnalyticsController.fireTag('link', result);
         if (navigateToHref) {
           window.location.href = e.target.closest('a').href;
         }
@@ -182,8 +209,9 @@ class Analytics {
       });
     }
   };
-
-  static getImpressionEventTagListener(config) {
+  
+  getImpressionEventTagListener(config) {
+    const trackImpression = this.analytics.track;
     return (e) => {
       async function fetchAnalytics(fetchDataPromises) {
         const result = [];
@@ -191,12 +219,12 @@ class Analytics {
           const r = await fetchDataPromises[i](e);
           result.push(r);
         }
-        return { _analytics: result };
+        return result;
       }
 
       fetchAnalytics(Object.values(config.data || {})).then((result) => {
-        result._analytics.impression = true;
-        Analytics.fireTag('link', result);
+        result._AnalyticsController.impression = true;
+        trackImpression(result);
         window.location.href = e.target.closest('a').href;
       }, (reason) => {
         console.error('Analytics data fetch failed.  Rejection reason: ', reason);
@@ -242,34 +270,32 @@ class Analytics {
       return false;
     }
     tagMeta.forEach((config) => {
-      Analytics.validateTagConfig(config);
+      AnalyticsController.validateTagConfig(config);
     });
     return true;
   };
 
   addEventListeners(analyticsDataMap) {
     // const getAnalyticsDataForElement = (dataHashMap) => (Promise.all(dataHashMap.map((p) => (resolvedDataMap(p)))))
+    const trackPage = this.analytics.page;
+    
     const getAnalyticsDataForElement = (dataHashMap) => {
-      console.log('dataHashMap:', dataHashMap);
-      // return Promise.props(dataHashMap)
       let combinedDataHashMap = {};
       Object.entries(dataHashMap).map((entry) => {
         const entity = entry[0];
-        combinedDataHashMap[entity] = analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])
+        combinedDataHashMap[entity] = analyticsDataMap && (typeof analyticsDataMap[entity]!== "undefined")
+                                        && analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])
       });
-
       return Promise.props(combinedDataHashMap)
     }
 
-
     const fireViewEventTag = (config) => {
-
       let { data = {} } = config;
 
       const viewTagPromise = getAnalyticsDataForElement(data).then((result) => {
         let utagData = {}; // TODO: maybe add static defaults?
         Object.assign(utagData, result);
-        Analytics.fireTag('view', { _analytics: utagData });
+        trackPage(utagData);
       }, (reason) => {
         console.error('rejection reason: ', reason);
       });
@@ -286,7 +312,7 @@ class Analytics {
           if (el.analytics.events) {
             Object.assign(el.analytics.events, item.events);
           } else {
-            el.anaytics.events = item.events;
+            el.analytics.events = item.events;
           }
           if (el.analytics.data) {
             Object.assign(el.analytics.data, item.data);
@@ -314,21 +340,17 @@ class Analytics {
       }
 
       if (events.link) {
-        const clickListener = Analytics.getClickEventTagListener(el.analytics);
+        const clickListener = this.getClickEventTagListener(el.analytics);
         el.addEventListener('click', clickListener);
       }
 
       if (events.impression) {
-        const impressionListener = Analytics.getImpressionEventTagListener(el.analytics);
+        const impressionListener = this.getImpressionEventTagListener(el.analytics);
         el.addEventListener('observed', impressionListener);
         this.intersectionObserver.observe(el);
       }
     });
 
-    console.log('viewTag: ', viewTag);
-
     return viewTag || new Promise((resolve) => { resolve(true) });
   }
 }
-
-export default Analytics;

@@ -1,6 +1,6 @@
 import AnalyticsService from '../AnalyticsService';
-import ExperimentSDK from '@component/experiment';
-module.exports = {
+
+export default {
   tagMeta: [
     // default page view tag.
     {
@@ -10,19 +10,17 @@ module.exports = {
         page: () => (new Promise((resolve) => {
           resolve({ 
             event_name: 'page view',
-            // recipes: () => ExperimentSDK.getAllSelectedRecipes.promise
-            recipes: ['put promise for recipes here']
           });
         })),
         experiment: AnalyticsService.experiment
       },
     },
-    // product links on home page
+    /*// product links on home page
     {
       selector: 'a[data-hl-productid]',
       events: { link: true },
       data: { link: e => (new Promise((resolve) => { resolve(e.target.closest('a[href]')); })) },
-    },
+    },*/
 
     // all non-anchor element links on marketing-campaigns (have data attribute 'linktrack')
     {

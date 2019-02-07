@@ -5,7 +5,7 @@ export default {
     // default page view tag.
     {
       selector: 'html',
-      events: { view: true },
+      events: { view: {} },
       data: {
         page: () => (new Promise((resolve) => {
           resolve({ 
@@ -23,15 +23,11 @@ export default {
     },*/
 
     // all non-anchor element links on marketing-campaigns (have data attribute 'linktrack')
-    {
+    /*{
       selector: 'a[data-linktrack]',
       events: {link: true},
       data: { link: e => (new Promise((resolve) =>{resolve({link_name: e.srcElement.dataset.linktrack})}))}
-    },
-    {
-      selector: '.hl-name',
-      events: { link: true },
-      data: { productName: e => ({ name: e.target.innerHTML }) },
-    },
+    }*/
+    
   ],
 };

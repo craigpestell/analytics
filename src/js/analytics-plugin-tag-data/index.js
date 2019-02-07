@@ -4,11 +4,18 @@ import ExpSDK from '@component/experiment';
 // const ExpSdk = new ExperimentationSDK();
 
 const tagData = store => next => action => {
-  // console.log('################### inside middleware')
+  console.log('################### inside middleware')
   let asyncResponse = false;
   if (action.type) {
     console.log(`>> dispatching ${action.type}`)
     
+    if(action.type == "initializeStart") {
+      console.log('initializing Analytics...');
+      Object.assign(action, {});
+      return action;
+    }
+
+
     if(action.type == "pageStart") {
       asyncResponse = true;
       // add experiment_ids

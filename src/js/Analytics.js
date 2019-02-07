@@ -1,4 +1,7 @@
 import Analytics from 'analytics';
+
+// import pubsub from '@component/common/src/util/PublishSubscribe';
+
 import TagDataPlugin from './analytics-plugin-tag-data';
 import TagManagerPlugin from './analytics-plugin-tag-manager';
 import { validate, ParameterValidationError } from 'parameter-validator';
@@ -7,7 +10,6 @@ import Promise from 'prfun'; // subclasses global.Promise
 import defaultConfig from './config/config.default';
 import AnalyticsService from './AnalyticsService';
 
-console.log('defaultConfig: ', defaultConfig);
 /*
 // tag configuration
 {
@@ -34,7 +36,11 @@ console.log('defaultConfig: ', defaultConfig);
   }
 },
 
+// dataMap
+
 */
+
+const EVENTS = {view: undefined, link: undefined};
 
 /** 
  * Analytics
@@ -46,17 +52,33 @@ export default class AnalyticsController {
    * @param {Object} [options=defaultConfig] Tag configuration.
    * @param {Array} [options.tagMeta] Tag configurations per CSS selector.
    */
-  constructor(options) {
+  constructor(options = {}) {
     let config = options;
     if (options && options.tagMeta) {
       config.tagMeta = defaultConfig.tagMeta.concat(config.tagMeta);
     }else{
       config = defaultConfig;
     }
+
+    // Must provide channel
+    try {
+      const { channel } = validate(options, ['channel']);
+    } catch (error) {
+      if (error instanceof ParameterValidationError) {
+        console.error(error.message);
+        // "Invalid value of 'undefined' was provided for parameter 'options.channel'."
+        return false;
+      }
+    }
+
     AnalyticsController.validateTagMeta(config.tagMeta);
 
+    this.pubsubChannel = config.pubsubChannel || null;
     this.tagMeta = config.tagMeta;
 
+    if(options.dataMap){
+      this.dataMap =  options.dataMap;
+    }
     this.defaultAnalyticsDataMap = this.defaultAnalyticsDataMap.bind(this);
     this.addEventListeners = this.addEventListeners.bind(this);
     this.getClickEventTagListener = this.getClickEventTagListener.bind(this);
@@ -73,31 +95,61 @@ export default class AnalyticsController {
       entries[0].target.dispatchEvent(observedEvent);
     });
 
-    this.initAnalytics({debug: true});
+    this.initAnalytics({debug: true, channel: options.channel});
+    
   }
 
   initAnalytics(options = {debug: false}) {
     this.analytics = Analytics({
       debug: options.debug,
-      app: 'digital-product-ui-bcom',
+      exposeRedux: true,
+      app: 'digital-analytics',
       version: 100,
       plugins: [
         TagManagerPlugin({
           env: 'dev', 
-          brand: 'bcom'
+          brand: options.brand || 'bcom'
         }),
         TagDataPlugin
       ]
     })
 
-    /* if(options.debug) {
-      this.analytics.on('*', ({ payload }) => {
-        console.log(`* listener ${payload.type} with payload: ${JSON.stringify(payload.properties, null, '\t')}`)
-      })
-    }*/
-    this.analytics.on('*', ({ payload }) => {
-      console.log(`* listener ${payload.type} with payload: ${JSON.stringify(payload.properties, null, '\t')}`)
+    // set up app channel pubsub communication with analytics pubsub
+    options.channel.on('analytics:add-tag', (tag) => {
+      this.analytics.dispatch({type: 'analytics:add-tag', tag});
+      this.addEventListeners();
     })
+    options.channel.on('analytics::*', (data) => {
+      
+      console.log('app channel received analytics generic data: ' ,data);
+      this.analytics.dispatch({type: 'analytics::*', data});
+    });
+
+    if(options.debugListeners || options.debug) {
+      this.analytics.on(options.debugListeners || '*', ({ payload }) => {
+        // console.log(`* listener ${payload.type} with payload: ${JSON.stringify(payload.properties, null, '\t')}`)
+        console.log(`* listener ${payload.type}`)
+      })
+    }
+
+    /* this.analytics.on('analytics::configuration', (config) => {
+      console.log('$$$$$$$$$$$$$ adding tag: ', config);
+      this.addTag(config);
+    }) */
+    
+    this.analytics.on('initializeStart', () => {
+      console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$   initializeStart event');
+      this.analytics.dispatch({type: 'analytics::configuration', payload: config});
+    });
+    
+    this.analytics.on('analytics::*', ({payload}) => {
+      console.log(`########## analytics::* listener ${payload.type}`);
+    });
+
+    this.analytics.on('analytics:add-tag', ({payload}) => {
+      this.addTag(payload.tag);
+    })
+    
   }
 
   /**
@@ -109,6 +161,7 @@ export default class AnalyticsController {
   addTag(config) {
     const { selector, events } = AnalyticsController.validateTagConfig(config); // eslint-disable-line no-unused-vars
     this.tagMeta.push(config);
+    this.analytics.dispatch({type: 'analytics::configuration', payload: config});
   }
 
   /**
@@ -173,6 +226,24 @@ export default class AnalyticsController {
     return defaultHandler;
   };
 
+  fetchDataMap (e) {
+      /*let combinedDataHashMap = {};
+      Object.entries(dataHashMap).map((entry) => {
+        const entity = entry[0];
+        combinedDataHashMap[entity] = analyticsDataMap && (typeof analyticsDataMap[entity]!== "undefined")
+            && analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])
+      });*/
+      const dataMap = e && e.currentTarget && e.currentTarget.analytics && e.currentTarget.analytics.data || e;
+      Object.entries(dataMap).forEach((entry) => {
+        if(!entry[1]) {
+          dataMap[entry[0]] = AnalyticsService[entry[0]] && AnalyticsService[entry[0]](e);
+        }else if(!(dataMap[entry[0]] instanceof Promise)){
+          dataMap[entry[0]] = dataMap[entry[0]](e);
+        }
+      })
+      return Promise.props(dataMap)
+    }
+
   /**
    * spyOn().and.returnValue(false) in tests to not redirect browser during debugging.
    */
@@ -212,6 +283,24 @@ export default class AnalyticsController {
   
   getImpressionEventTagListener(config) {
     const trackImpression = this.analytics.track;
+    
+    function impressionListener (e) {
+      let { data = {} } = config;
+      this.fetchDataMap(e).then((result) => {
+        let utagData = {}; // TODO: maybe add static defaults?
+        Object.assign(utagData, result);
+        trackImpression('impression', utagData);
+      }, (reason) => {
+        console.error('rejection reason: ', reason);
+      });
+    }
+    impressionListener = impressionListener.bind(this);
+    return impressionListener;
+  };
+
+  /*
+  getImpressionEventTagListener(config) {
+    const trackImpression = this.analytics.track;
     return (e) => {
       async function fetchAnalytics(fetchDataPromises) {
         const result = [];
@@ -223,14 +312,16 @@ export default class AnalyticsController {
       }
 
       fetchAnalytics(Object.values(config.data || {})).then((result) => {
-        result._AnalyticsController.impression = true;
-        trackImpression(result);
-        window.location.href = e.target.closest('a').href;
+        
+        trackImpression('impression......', result);
+
       }, (reason) => {
         console.error('Analytics data fetch failed.  Rejection reason: ', reason);
       });
     }
   };
+
+   */
 
   /** 
    * Validate individual tag configuration.
@@ -276,23 +367,13 @@ export default class AnalyticsController {
   };
 
   addEventListeners(analyticsDataMap) {
-    // const getAnalyticsDataForElement = (dataHashMap) => (Promise.all(dataHashMap.map((p) => (resolvedDataMap(p)))))
+    // const fetchDataMap = (dataHashMap) => (Promise.all(dataHashMap.map((p) => (resolvedDataMap(p)))))
     const trackPage = this.analytics.page;
     
-    const getAnalyticsDataForElement = (dataHashMap) => {
-      let combinedDataHashMap = {};
-      Object.entries(dataHashMap).map((entry) => {
-        const entity = entry[0];
-        combinedDataHashMap[entity] = analyticsDataMap && (typeof analyticsDataMap[entity]!== "undefined")
-                                        && analyticsDataMap(dataHashMap[entity]) || this.defaultAnalyticsDataMap(dataHashMap[entity])
-      });
-      return Promise.props(combinedDataHashMap)
-    }
-
     const fireViewEventTag = (config) => {
       let { data = {} } = config;
 
-      const viewTagPromise = getAnalyticsDataForElement(data).then((result) => {
+      const viewTagPromise = this.fetchDataMap(data).then((result) => {
         let utagData = {}; // TODO: maybe add static defaults?
         Object.assign(utagData, result);
         trackPage(utagData);
@@ -335,21 +416,52 @@ export default class AnalyticsController {
       }
       const { events } = el.analytics;
 
-      if (events.view) {
+      if (events.view && !events.view.fired) {
         viewTag = fireViewEventTag(el.analytics);
+        el.analytics.events.view.fired = true;
       }
 
       if (events.link) {
         const clickListener = this.getClickEventTagListener(el.analytics);
         el.addEventListener('click', clickListener);
+        el.analytics.events.link.fired = true;
       }
 
       if (events.impression) {
         const impressionListener = this.getImpressionEventTagListener(el.analytics);
         el.addEventListener('observed', impressionListener);
         this.intersectionObserver.observe(el);
+        el.analytics.events.impression.fired = true;
+      }
+
+      // register any custom events
+
+      if(this.pubsubChannel){
+        Object.keys(events).filter((event) => (!Object.keys(EVENTS).includes(event)))
+        .forEach((e) => {
+          // add custom event listener
+          const eventLabel = `${e}`;
+          console.log('adding customEvent ' + eventLabel);
+          this.pubsubChannel.on(`analytics::${eventLabel}`, (data) => {
+
+            console.log('passing data via app channel and calling analytics event: ', data);
+            this.analytics.on(`analytics:custom-event::${eventLabel}`, ({ payload }) => {
+              console.log(`analytics listener ${eventLabel} with payload: ${payload.type}`)
+              //this.analytics.on(`analytics:custom-event::${eventLabel}`, ({ payload }) => {
+              //  console.log(`analytics custom-event listener ${eventLabel} with payload: ${payload.type}`)
+              //}) 
+              
+            })
+            this.analytics.track(`analytics:custom-event::${eventLabel}`, {test: 'payload', data}) 
+          })
+        });
       }
     });
+
+    this.analytics.on('analytics::configuration', (config) => {
+      console.log('analytics::configuration event: ', config);
+
+    })
 
     return viewTag || new Promise((resolve) => { resolve(true) });
   }

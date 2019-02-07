@@ -12,7 +12,7 @@ const config = {
 
 export default function TagManagerPlugin(userConfig) {
   return {
-    NAMESPACE: 'tagmanager',
+    NAMESPACE: 'tag-manager',
     config: Object.assign({}, config, userConfig),
     initialize: ({ config }) => {
       const {brand, env} = config
@@ -35,7 +35,7 @@ export default function TagManagerPlugin(userConfig) {
     },
     page: ({ payload }) => {
       if (inBrowser && typeof utag !== 'undefined') {
-        console.info(`TagManager Pageview > ${window.location.href}`)
+        console.info(`TagManager Pageview > [payload: ${JSON.stringify(payload, null, 2)}]`)
         TagManagerUtil.fireTag('view', payload.properties);
 
         // utag.page(document.location.href, payload.properties) // eslint-disable-line

@@ -1,4 +1,8 @@
 // tagdata-plugin.js redux middleware
+
+
+// here we should intercept each event, and for each dataEntity assigned to the element, fetch the data and assign to
+//  the tag.
 import ExpSDK from '@component/experiment';
 
 // const ExpSdk = new ExperimentationSDK();

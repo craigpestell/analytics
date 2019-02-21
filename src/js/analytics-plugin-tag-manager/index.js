@@ -27,7 +27,7 @@ export default function TagManagerPlugin(userConfig) {
         window.utag_cfg_ovrd = {noview : true};
         //Loading script asynchronously
         (function(a,b,c,d){
-                a='//tags.tiqcdn.com/utag/bcom/main/{{properties.tagEnv}}/utag.js';
+                a='//tags.tiqcdn.com/utag/{{properties.brand}}/main/{{properties.tagEnv}}/utag.js';
                 b=document;c='script';d=b.createElement(c);d.src=a;d.type='text/java'+c;d.async=true;
                 a=b.getElementsByTagName(c)[0];a.parentNode.insertBefore(d,a);
         })();

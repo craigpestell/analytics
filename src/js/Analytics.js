@@ -60,9 +60,9 @@ export default class AnalyticsController {
       config = defaultConfig;
     }
     this.eventDataHandlers = config.eventDataHandlers || [];
+    
     this.domEvents = config.domEvents || {};
-
-    // Must provide channel
+        // Must provide channel
     try {
       const { channel } = validate(options, ['channel']);
     } catch (error) {
@@ -71,6 +71,8 @@ export default class AnalyticsController {
         // "Invalid value of 'undefined' was provided for parameter 'options.channel'."
         return false;
       }
+    
+    }
     
     this.dataMap =  options.dataMap || undefined;
     
@@ -90,15 +92,12 @@ export default class AnalyticsController {
       entries[0].target.dispatchEvent(observedEvent);
     });
 
-    this.initAnalytics({debug: true, channel: options.channel});
+    this.analytics = this.initAnalytics({debug: true, channel: options.channel});
     
-  }}
-  
-
-
+  }
 
   initAnalytics(options = {debug: false}) {
-    this.analytics = Analytics({
+     return Analytics({
       debug: options.debug,
       exposeRedux: true,
       app: 'digital-analytics',
@@ -112,19 +111,16 @@ export default class AnalyticsController {
       ]
     })
 
-
-
-
-
     // set up app channel pubsub communication with analytics pubsub
     options.channel.on('analytics:track', (payload) => {
       this.analytics.dispatch({type: 'analytics:track', payload});
     })
 
-    options.channel.on('analytics:add-tag', (tag) => {
-      this.analytics.dispatch({type: 'analytics:add-tag', tag});
-      this.addEventListeners();
+    options.channel.on('analytics:view:initialize', (payload) => {
+      console.log('dispatching view:initialize to analytics');
+      this.analytics.dispatch({type: 'analytics:view:initialize', payload});
     })
+
     options.channel.on('analytics:configure', (data) => {
       
       console.log('app channel received analytics configuration data: ' ,data);
@@ -143,6 +139,10 @@ export default class AnalyticsController {
       this.addTag(config);
     }) */
     
+    this.analytics.on('analytics:view:initialize', ( payload ) => {
+      console.log('inside analytics:view:initialize listener');
+    });
+
     this.analytics.on('initializeStart', () => {
       console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$   initializeStart event');
       this.analytics.dispatch({type: 'analytics::configuration', payload: config});
@@ -163,6 +163,8 @@ export default class AnalyticsController {
   }
 
   trackDomEvents(domEvents){
+    const { analytics } = this;
+    
     const derivedEvents = domEvents || this.domEvents;
     derivedEvents.forEach((config) =>{
       const {selector, events} = config;
@@ -171,12 +173,23 @@ export default class AnalyticsController {
           const eventName = ev[0];
           const handler = ev[1];
           
-          const elList = (config.selectorIsId) ? [document.getElementById(selector)] : document.querySelectorAll(selector);
+          const elList = (config.selectorIsId) ? [document.getEfementById(selector)] : document.querySelectorAll(selector);
           for(i = 0; i < elList.length; i++){
-          elList[0].addEventListener(eventName, (e) => {
-            this.analytics.trigger('domEvent: ', e);
-          })
-            
+            let el = elList[i];
+            if(!el.analytics){
+              el.analytics = {events: {}};
+            }
+            Object.assign(el.analytics.events, events);
+
+            const track = (eventName, payload, options, callback) => {
+              el.analytics.events[eventName].fired = true;
+              analytics.track(eventName, payload, options, callback);
+            }     
+
+            el.track = track;
+            el.addEventListener(eventName, (e) => {
+              el.track(eventName, {'tracking': 'data'})
+            })
           }
         })
       }

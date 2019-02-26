@@ -1,13 +1,13 @@
-import AnalyticsController from './js/Analytics';
+import AnalyticsController from './AnalyticsController';
 import AnalyticsValidator from './js/AnalyticsValidator';
 
-import AnalyticsViewBehavior from './js/behaviors/ViewBehavior';
+import AnalyticsViewBehavior  from './js/behaviors/ViewBehavior';
 
 /**
  * Analytics module.
  * @module @component/analytics
  * @see module:@component/analytics
  */
-
-export { AnalyticsController as Analytics, AnalyticsValidator, AnalyticsViewBehavior };
-export default AnalyticsController;
+const Analytics = AnalyticsController;
+export { AnalyticsValidator,  AnalyticsViewBehavior };
+export default Analytics;

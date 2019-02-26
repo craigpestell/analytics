@@ -1,5 +1,6 @@
 import * as Mn from 'backbone.marionette';
 import PageApp from 'pageApp';
+
 import AnalyticsService from '@component/analytics';
 
 /*const ViewBehavior = Mn.Behavior.Extend({
@@ -8,6 +9,7 @@ import AnalyticsService from '@component/analytics';
 /* Mn.Behaviors.behaviorsLookup = function() {
     return this.window.Behaviors;
 };*/
+
 
 const AnalyticsViewBehavior = Mn.Behavior.extend({
     // You can set default options
@@ -26,35 +28,23 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
 
     // 
     initialize: function(options) {
-        console.log('AnalyticsBehavior initialize');
-
-        this.pubsub = options.channel || PageApp.channel;
+       console.log('init AnalyticsViewBehavior');
+       //  window.Analytics.track('view', this.el);
+        
+        /*this.pubsub = options.channel || PageApp.channel;
         //publish the configuration.
-        let data = {};
-        let key = `feature-data`;
-        if(this.view.options.el){
-            key = this.view.options.el;
-        }
-        if(AnalyticsService[key]) {
-            data = {[key]: AnalyticsService[key]}; 
-        }
 
-        this.listenTo(this.view,'analytics::view', (data) => {
+        this.listenTo(this.view,'analytics:track', (data) => {
             console.log('viewBehavior onRender channel event args: ',arguments);
             console.log('AnalyticsViewBehavior received analytics event on view: ', data);
+            this.pubsub.trigger('analytics:track', this)
         });
 
+        this.pubsub.trigger('analytics:view:initialize', this);*/
 
         
-        this.pubsub.trigger('analytics:track', {
-            selector: key,
-            events: {view: true},
-            data
-        });
+        
 
-        this.el.addEventListener('analytics:track', (data) => {
-            console.log('Analytics in ViewBehavior initialize analytics:track addEventListener')
-        })
     },
 
     /*
@@ -62,21 +52,32 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
       'click .bar-button': 'click:barButton'
     },
     */
+    
+    ui: {
+        callToAction: '.cta',
+    },
+    events: {
+        'click @ui.callToAction': 'onClickCta'
+    },
+    
     triggers: {
-        'click .analytics-cta': 'click:cta'
+        'click @ui.callToAction': 'callToAction',
+        'analytics:cta': 'onCta',
+        'analytics:ctaSuccess': 'onCtaSuccess',
     },
     onCta() {
         console.log('$$$$CTA');
         this.view.trigger('analytics', {'cta': 'data'});
+    },
+    // analytics:ctaSuccess
+    onCtaSuccess(){
+        console.log('Thumbnail onAnalyticsCtaSuccess');
     },
     onRender() {
         const args = arguments;
         console.log('viewBehavior onRender args:', arguments)
         // fire view tag
         this.view.trigger('analytics:track', {event_type: 'view', event_name: 'onRender'});
-    },
-    events: {
-    'click .an .primary': 'onClickPrimary'
     },
     
     modelEvents: {
@@ -85,23 +86,21 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
     collectionEvents: {
         'change': 'onChangeCollection'
     },
-    onClickPrimary(evt) {
+    onClickCta(evt) {
         // Primary call-to-action link click.
-        PageApp.channel.trigger('analytics:add-tag', 
-        {
-            some: 'data'
-        });
-
+        Analytics.track('link', evt);
     },
     onClickBarButton(view, evt) {
         // ..
     },
     onChangeModel(model, opts) {
         // ..
-        console.log('model changed');
+        console.log('model changed:', model, 'opts: ', opts);
+        this.pubsub.trigger('analytics:track:model:change', evt);
     },
     onChangeCollection(model, opts) {
         // ..
+        this.pubsub.trigger('analytics:track:collection:change', evt);
     }
 });
 

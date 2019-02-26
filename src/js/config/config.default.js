@@ -1,50 +1,164 @@
 import AnalyticsService from '../AnalyticsService';
 import app from 'pageApp';
 
+const EVENT_TYPE = {
+  VIEW: 'view',
+  CLICK: 'click',
+  IMPRESSION: 'impression',
+  MOUSEOVER: 'mouseover'
+};
+class AnalyticsEvent extends CustomEvent{
+  constructor (type, channel, data = {}) {
+    super(channel);
+
+    if (!Object.keys(EVENT_TYPE).includes(type)) {
+      throw "Error: invalid event type specified.";
+    }
+    if(!channel){
+      throw "Error: no channel specified.";
+    }
+    this.type = type
+    this.channel = channel;
+    this.trackCount = 0;
+    
+  }
+  track(data) {
+    ++this.trackCount;
+    if(typeof data === "function"){
+      // fetch promised data.
+    }
+    this.detail = data;
+  }
+}
+
+// describe a module to track events for
+class Module {
+  constructor(type, name){
+    this.type = type;
+    this.name = name;
+    this.events = [];
+
+  }
+  get channel(){
+    return `${this.type}::${this.name}`;
+  }
+  addEvent(event){
+    this.events.push(event);
+  }
+}
+
+// describe collection of modules to track events for.
+class Page {
+  constructor(key, name) {
+    this.key = key;
+    this.name = name;
+    this.modules = [];
+  }
+  
+  addModule(module) {
+    this.modules.push(module);
+  }
+}
+
+const myTestPage = new Page('discovery-pages');
+const qvModule = new Module('quick-view', { channel: 'feature::quick-view'});
+const qvOpenedEvent = new AnalyticsEvent(EVENT_TYPE.VIEW, qvModule.channel, () => {
+
+});
+
+qvModule.addEvent()
+const qbModule = new Module('quick-bag', { channel: 'feature::quick-bag'});
+const productThumbnailModule = new Module('product-thumbnail', {channel: 'component::product-thumbnail'});
+
+myTestPage.addModule(qvModule);
+myTestPage.addModule(qbModule);
+myTestPage.addModule(productThumbnailModule);
+
+
+const TrackingEvents = {
+  [Modules.page.browse]: {
+    view: 'view',
+    redirect: 'redirect',
+  },
+  [Modules.page.product]: {
+    view: 'view'
+  }
+}
+
+
 export const Actions = {
   page: {
-    view: 'page:view',
-    redirect: 'page:redirect'
+    discoveryPages: {
+      view: 'page:view',
+      redirect: 'page:redirect',
+    },
+    digitalProductUiBcom: {
+      view: 'page:view'
+    }
   },
-  element: {
-    link: 'element:link',
-    impression: 'element:impression'
+  feature: {
+    quickView: {
+      view: 'quick-view:view',
+    },
+    addToBag: {
+      success: 'addToBag:success'
+    },
   },
-  quickView: {
-    view: 'quick-view:view',
+  component: {
+    product: {
+      link: 'product:link' // product thumbnail click
+    },
   },
-  addToBag: {
-    success: 'addToBag:success'
+  dom: {
+    element: {
+      link: 'element:link',
+      impression: 'element:impression'
+    }
   },
-  product: {
-    link: 'product:link' // product thumbnail click
-  }
 };
 
+
+
 const eventDataHandlers = {
-  [Actions.element.link]: {
-    linkData: e => (new Promise((resolve) =>{resolve({link_name: e.srcElement.dataset.linktrack})}))
+  Actions.dom: {
+    element: {
+      link: {
+        linkData: e => (new Promise((resolve) => { resolve({ link_name: e.srcElement.dataset.linktrack }) }))
+      },
+impression: {
+  linkData: e => (new Promise((resolve) => { resolve({ link_name: e.srcElement.dataset.linktrack }) }))
+},
+    }
   },
-  [Actions.element.impression]: {
-    linkData: e => (new Promise((resolve) =>{resolve({link_name: e.srcElement.dataset.linktrack})}))
+Actions.page: {
+  discoveryPages: {
+    view: {
+      page_name: 'lets get the page name and put it here',
+        page: AnalyticsService.page
+    },
+    redirect: {
+      page_name: 'lets get the page name and put it here',
+        page: AnalyticsService.page
+    },
   },
-  [Actions.page.view]: {
-    page_name: 'lets get the page name and put it here',
-    page: AnalyticsService.page
+},
+Actions.feature: {
+  quickView: {
+    view: {
+      quickView: AnalyticsService.quickView
+    }
   },
-  [Actions.page.redirect]: {
-    page_name: 'lets get the page name and put it here',
-    page: AnalyticsService.page
+  addToBag: {
+    success: {
+      addToBag: AnalyticsService.addToBag
+    },
   },
-  [Actions.quickView.view]: { 
-    quickView: AnalyticsService.quickView
-  },
-  [Actions.addToBag.success]: {
-    addToBag: AnalyticsService.addToBag
-  },
-  [Actions.product.link]: {
-    product: e => (new Promise((resolve) => { resolve(e.target.closest('a[href]')); })) 
+  product: {
+    link: {
+      product: e => (new Promise((resolve) => { resolve(e.target.closest('a[href]')); }))
+    }
   }
+}
 };
 
 export default {
@@ -56,7 +170,7 @@ export default {
       events: { view: {} },
       data: {
         page: () => (new Promise((resolve) => {
-          resolve({ 
+          resolve({
             event_name: 'page view',
           });
         })),
@@ -76,15 +190,15 @@ export default {
       events: {link: true},
       data: { link: e => (new Promise((resolve) =>{resolve({link_name: e.srcElement.dataset.linktrack})}))}
     }*/
-    
+
   ],
 
 
   // configure data entities here?
 
-   
-  
-  
+
+
+
 
   domEvents: [
     {
@@ -97,7 +211,7 @@ export default {
       selector: 'a[data-hl-productid]',
       events: {
         click: eventDataHandlers[Actions.product.link]
-      } 
+      }
     },
     {
       selector: '.productThumbnail',
@@ -110,8 +224,8 @@ export default {
 
     quickView: AnalyticsService.quickView(),
     page: AnalyticsService.page(),
-    quickBag: new Promise((resolve) => { resolve({'qbData': 'some data'})})
-    
+    quickBag: new Promise((resolve) => { resolve({ 'qbData': 'some data' }) })
+
     // discovery-pages page-view client-side
     /*
         const utagData = {
@@ -179,7 +293,7 @@ export default {
         product_badge_new_arrival: newArrival ? [newArrival.toString()] : [''],
         product_badge_new_markdown: newMarkDown ? [newMarkDown.toString()] : [''],
         product_pricing_state: pricingState ? [pricingState.toString()] : [''], */
-    
+
     // registry add
     /*
         product_color: [product.color],

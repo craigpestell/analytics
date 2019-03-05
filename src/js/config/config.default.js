@@ -7,8 +7,10 @@ const EVENT_TYPE = {
   IMPRESSION: 'impression',
   MOUSEOVER: 'mouseover'
 };
-class AnalyticsEvent extends CustomEvent{
-  constructor (type, channel, data = {}) {
+
+// dispatched when we want to track the user's action.
+class TrackedEvent extends CustomEvent{
+  constructor (channel, data = {}) {
     super(channel);
 
     if (!Object.keys(EVENT_TYPE).includes(type)) {
@@ -17,8 +19,9 @@ class AnalyticsEvent extends CustomEvent{
     if(!channel){
       throw "Error: no channel specified.";
     }
-    this.type = type
+    
     this.channel = channel;
+    this.data = data;
     this.trackCount = 0;
     
   }
@@ -49,24 +52,35 @@ class Module {
 
 // describe collection of modules to track events for.
 class Page {
-  constructor(key, name) {
-    this.key = key;
-    this.name = name;
+  constructor(options = {key: undefined, name:undefined, appChannel:undefined}) {
+    this.channel = options.appChannel;
+    this.key = options.key;
+    this.name = options.name;
     this.modules = [];
+    this.collectTrackingEvents();
   }
   
   addModule(module) {
     this.modules.push(module);
   }
+  
+  // request all events we want to track from each module.
+  collectTrackingEvents() {
+    this.modules.forEach((m) =>{
+        this.channel.request(m.channel, (result) => {
+          console.log('tracking configuration for module: ', result);
+        })
+    });
+  }
 }
 
-const myTestPage = new Page('discovery-pages');
+const myTestPage = new Page({key: 'dp', name: 'discovery-pages', appChannel: app.channel});
 const qvModule = new Module('quick-view', { channel: 'feature::quick-view'});
-const qvOpenedEvent = new AnalyticsEvent(EVENT_TYPE.VIEW, qvModule.channel, () => {
-
+const qvOpenedEvent = new TrackedEvent(qvModule.channel, (e) => {
+  console.log('qvOpenedEvent');
 });
 
-qvModule.addEvent()
+qvModule.addEvent(qvOpenedEvent);
 const qbModule = new Module('quick-bag', { channel: 'feature::quick-bag'});
 const productThumbnailModule = new Module('product-thumbnail', {channel: 'component::product-thumbnail'});
 
@@ -75,15 +89,6 @@ myTestPage.addModule(qbModule);
 myTestPage.addModule(productThumbnailModule);
 
 
-const TrackingEvents = {
-  [Modules.page.browse]: {
-    view: 'view',
-    redirect: 'redirect',
-  },
-  [Modules.page.product]: {
-    view: 'view'
-  }
-}
 
 
 export const Actions = {

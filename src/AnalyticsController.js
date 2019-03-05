@@ -4,6 +4,7 @@ import TagManagerPlugin from './plugins/analytics-plugin-tag-manager';
 import TagDataPlugin from './plugins/analytics-plugin-tag-manager';
 import AdobeViaTealium from './plugins/adobe-analytics-via-tealium';
 import lifecycleExample from './plugins/analytics-plugin-lifecycle-example'
+import loggerPlugin from './plugins/logger-plugin';
 import visualizeLifecycle from './plugins/visualize-analytics'
 
 const options = {brand: 'mcom', debug: true};
@@ -40,17 +41,12 @@ function listenerPlugin(userConfig) {
       // Fire custom logic before .track calls
       console.log('trackStart event.. put custom login here.');
     },
-    'track:analytics': ({ payload, config, instance }) => {
-      // Fire custom logic before customer.io plugin runs.
-      // Here you can customize the data sent to individual analytics providers
-      console.log('track:analytics event:', payload.payload);
-    },
+    
     'track:adobe-via-tealium': ({ payload, config, instance }) => {
       // Fire custom logic before adobe-via-tealium plugin runs.
       // Here you can customize the data sent to individual analytics providers
       console.log('track:adobe-via-tealium event:', payload.payload);
     },
-
     ctaSuccess: ({ payload, config, instance }) => {
       // Fire custom logic before .track calls
       console.log('ctaSuccess event:', payload);
@@ -59,13 +55,14 @@ function listenerPlugin(userConfig) {
     track: ({ payload, config, instance }) => {
       // Fire custom logic after .track calls
       const { properties, event } = payload;
-      
+      console.log('track:analytics event:', payload);  
+      // window.Analytics.track('ecommerce', payload);
     },
     trackEnd: ({ payload, config, instance }) => {
       // Fire custom logic after .track calls
       const { properties, event } = payload;
       async function trackAdobe(payload) {
-        await window.Analytics.dispatch({type: 'analytics', properties, event});
+        await window.Analytics.dispatch({type: 'ecommerce', properties, event});
       }
       // dispatch final payload to adobe
       return trackAdobe({type: 'adobe-via-tealium', properties, event});
@@ -85,7 +82,9 @@ if(!window.Analytics) {
     plugins: [
       listenerPlugin(),
       AdobeViaTealium(),
-      lifecycleExample()
+      lifecycleExample(),
+      loggerPlugin,
+      visualizeLifecycle
       /* TagManagerPlugin({
         env: 'dev', 
         brand: options.brand || 'bcom'

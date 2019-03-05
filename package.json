@@ -44,7 +44,7 @@
     "lodash": "^4.17.4"
   },
   "dependencies": {
-    "@component/common": "^1.237.0",
+    "@component/common": "^1.248.0",
     "@component/experiment": "file:../experiment",
     "analytics": "0.0.21",
     "parameter-validator": "^1.0.5",

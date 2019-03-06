@@ -1,88 +1,80 @@
-import AnalyticsService from '../AnalyticsService';
-import app from 'pageApp';
 
-const EVENT_TYPE = {
-  VIEW: 'view',
-  CLICK: 'click',
-  IMPRESSION: 'impression',
-  MOUSEOVER: 'mouseover'
-};
+import {EVENT_TYPE} from '../../util/constants';
+
+import AnalyticsService from '../AnalyticsService';
+import App from 'pageApp';
 
 // dispatched when we want to track the user's action.
-class TrackedEvent extends CustomEvent{
-  constructor (channel, data = {}) {
-    super(channel);
-
-    if (!Object.keys(EVENT_TYPE).includes(type)) {
-      throw "Error: invalid event type specified.";
-    }
-    if(!channel){
-      throw "Error: no channel specified.";
-    }
-    
-    this.channel = channel;
-    this.data = data;
-    this.trackCount = 0;
-    
+const TrackedEvent = (pubSubChannel, data) => {
+  if (!pubSubChannel) {
+    throw "Error: no channel specified.";
   }
-  track(data) {
-    ++this.trackCount;
-    if(typeof data === "function"){
+
+  let channel = pubSubChannel;
+  
+  let trackCount = 0;
+  let detail = {}
+  const track = (data) => {
+    ++trackCount;
+    if (typeof data === "function") {
       // fetch promised data.
     }
-    this.detail = data;
+    detail = data;
   }
 }
 
+
 // describe a module to track events for
 class Module {
-  constructor(type, name){
+  constructor(type, name) {
     this.type = type;
     this.name = name;
     this.events = [];
 
   }
-  get channel(){
+
+  get channel() {
     return `${this.type}::${this.name}`;
   }
-  addEvent(event){
+
+  addEvent(event) {
     this.events.push(event);
   }
 }
 
 // describe collection of modules to track events for.
 class Page {
-  constructor(options = {key: undefined, name:undefined, appChannel:undefined}) {
+  constructor(options = { key: undefined, name: undefined, appChannel: undefined }) {
     this.channel = options.appChannel;
     this.key = options.key;
     this.name = options.name;
     this.modules = [];
     this.collectTrackingEvents();
   }
-  
+
   addModule(module) {
     this.modules.push(module);
   }
-  
+
   // request all events we want to track from each module.
   collectTrackingEvents() {
-    this.modules.forEach((m) =>{
-        this.channel.request(m.channel, (result) => {
-          console.log('tracking configuration for module: ', result);
-        })
+    this.modules.forEach((m) => {
+      this.channel.request(m.channel, (result) => {
+        console.log('tracking configuration for module: ', result);
+      })
     });
   }
 }
 
-const myTestPage = new Page({key: 'dp', name: 'discovery-pages', appChannel: app.channel});
-const qvModule = new Module('quick-view', { channel: 'feature::quick-view'});
+const myTestPage = new Page({ key: 'dp', name: 'discovery-pages', appChannel: App && App.channel || null });
+const qvModule = new Module('quick-view', { channel: 'feature::quick-view' });
 const qvOpenedEvent = new TrackedEvent(qvModule.channel, (e) => {
   console.log('qvOpenedEvent');
 });
 
 qvModule.addEvent(qvOpenedEvent);
-const qbModule = new Module('quick-bag', { channel: 'feature::quick-bag'});
-const productThumbnailModule = new Module('product-thumbnail', {channel: 'component::product-thumbnail'});
+const qbModule = new Module('quick-bag', { channel: 'feature::quick-bag' });
+const productThumbnailModule = new Module('product-thumbnail', { channel: 'component::product-thumbnail' });
 
 myTestPage.addModule(qvModule);
 myTestPage.addModule(qbModule);
@@ -94,30 +86,30 @@ myTestPage.addModule(productThumbnailModule);
 export const Actions = {
   page: {
     discoveryPages: {
-      view: 'page:view',
-      redirect: 'page:redirect',
+      [EVENT_TYPE.VIEW]: 'page:view',
+      [EVENT_TYPE.REDIRECT]: 'page:redirect',
     },
     digitalProductUiBcom: {
-      view: 'page:view'
+      [EVENT_TYPE.VIEW]: 'page:view'
     }
   },
   feature: {
     quickView: {
-      view: 'quick-view:view',
+      [EVENT_TYPE.VIEW]: 'quick-view:view',
     },
     addToBag: {
-      success: 'addToBag:success'
+      success: 'addToBag:success' // REMOVE
     },
   },
   component: {
     product: {
-      link: 'product:link' // product thumbnail click
+      [EVENT_TYPE.CLICK]: 'product:link' // product thumbnail click
     },
   },
   dom: {
     element: {
-      link: 'element:link',
-      impression: 'element:impression'
+      [EVENT_TYPE.CLICK]: 'element:link',
+      [EVENT_TYPE.IMPRESSION]: 'element:impression'
     }
   },
 };
@@ -125,45 +117,33 @@ export const Actions = {
 
 
 const eventDataHandlers = {
-  Actions.dom: {
-    element: {
-      link: {
-        linkData: e => (new Promise((resolve) => { resolve({ link_name: e.srcElement.dataset.linktrack }) }))
-      },
-impression: {
-  linkData: e => (new Promise((resolve) => { resolve({ link_name: e.srcElement.dataset.linktrack }) }))
-},
-    }
+  [Actions.dom.element.link]: {
+    linkData: (e) => (new Promise((resolve) => { resolve({ link_name: e.srcElement.dataset.linktrack }) }))
   },
-Actions.page: {
-  discoveryPages: {
-    view: {
-      page_name: 'lets get the page name and put it here',
-        page: AnalyticsService.page
-    },
-    redirect: {
-      page_name: 'lets get the page name and put it here',
-        page: AnalyticsService.page
-    },
+  [Actions.dom.element.impression]: {
+    linkData: e => (new Promise((resolve) => { resolve({ link_name: e.srcElement.dataset.linktrack }) }))
   },
-},
-Actions.feature: {
-  quickView: {
-    view: {
-      quickView: AnalyticsService.quickView
-    }
+  [Actions.page.discoveryPages.view]: {
+    page_name: 'lets get the page name and put it here',
+      page: AnalyticsService.page
   },
-  addToBag: {
-    success: {
-      addToBag: AnalyticsService.addToBag
-    },
+  [Actions.page.discoveryPages.redirect]: {
+    page_name: 'lets get the page name and put it here',
+      page: AnalyticsService.page
   },
-  product: {
+  [Actions.feature.quickView.view]: {
+    quickView: AnalyticsService.quickView
+  },
+  [Actions.feature.quickView.product]: {
     link: {
       product: e => (new Promise((resolve) => { resolve(e.target.closest('a[href]')); }))
     }
-  }
-}
+  },
+  [Actions.feature.addToBag.success]: {
+    addToBag: AnalyticsService.addToBag
+  },
+
+
 };
 
 export default {
@@ -209,19 +189,19 @@ export default {
     {
       selector: 'a[data-linktrack]',
       events: {
-        click: eventDataHandlers[Actions.element.link],
+        click: eventDataHandlers[Actions.dom.element.link],
       },
     },
     {
       selector: 'a[data-hl-productid]',
       events: {
-        click: eventDataHandlers[Actions.product.link]
+        click: eventDataHandlers[Actions.component.product.link]
       }
     },
     {
       selector: '.productThumbnail',
       events: {
-        click: eventDataHandlers[Actions.product.link]
+        click: eventDataHandlers[Actions.component.product.link]
       }
     }
   ],

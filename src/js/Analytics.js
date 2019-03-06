@@ -2,8 +2,8 @@ import Analytics from 'analytics';
 
 // import pubsub from '@component/common/src/util/PublishSubscribe';
 
-import TagDataPlugin from './analytics-plugin-tag-data';
-import TagManagerPlugin from './analytics-plugin-tag-manager';
+import TagDataPlugin from '../plugins/analytics-plugin-tag-data';
+import TagManagerPlugin from '../plugins/analytics-plugin-tag-manager';
 import { validate, ParameterValidationError } from 'parameter-validator';
 import Promise from 'prfun'; // subclasses global.Promise
 
@@ -110,7 +110,7 @@ export default class AnalyticsController {
         TagDataPlugin
       ]
     })
-
+    
     // set up app channel pubsub communication with analytics pubsub
     options.channel.on('analytics:track', (payload) => {
       this.analytics.dispatch({type: 'analytics:track', payload});
@@ -162,10 +162,8 @@ export default class AnalyticsController {
     })
   }
 
-  trackDomEvents(domEvents){
-    const { analytics } = this;
-    
-    const derivedEvents = domEvents || this.domEvents;
+  static trackDomEvents(domEvents){
+    const derivedEvents = domEvents;
     derivedEvents.forEach((config) =>{
       const {selector, events} = config;
       if(events){
@@ -183,7 +181,7 @@ export default class AnalyticsController {
 
             const track = (eventName, payload, options, callback) => {
               el.analytics.events[eventName].fired = true;
-              analytics.track(eventName, payload, options, callback);
+              window.Analytics.track(eventName, payload, options, callback);
             }     
 
             el.track = track;

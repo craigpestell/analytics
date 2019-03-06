@@ -1,8 +1,6 @@
 import * as Mn from 'backbone.marionette';
 import PageApp from 'pageApp';
 
-import AnalyticsService from '@component/analytics';
-
 /*const ViewBehavior = Mn.Behavior.Extend({
     
 });*/
@@ -54,10 +52,12 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
     */
     
     ui: {
-        callToAction: '.cta',
+        callToAction: '.cta-primary',
+        callToActionSecondary: '.cta-secondary'
     },
     events: {
-        'click @ui.callToAction': 'onClickCta'
+        'click @ui.callToAction': 'onClickCta',
+        'click @ui.callToActionSecondary': 'onClickCtaSecondary',
     },
     
     triggers: {
@@ -90,6 +90,11 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
         // Primary call-to-action link click.
         Analytics.track('link', evt);
     },
+    onClickCtaSecondary(evt) {
+        // Primary call-to-action link click.
+        Analytics.track('link', evt);
+    },
+
     onClickBarButton(view, evt) {
         // ..
     },

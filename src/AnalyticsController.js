@@ -1,5 +1,7 @@
 import Analytics from 'analytics'
-// import googleAnalytics from 'analytics-plugin-ga'
+import AnalyticsController from './js/Analytics';
+import Pubsub from '@component/common/src/util/PublishSubscribe';
+import { ANALYTICS_OBSERVER_TYPE } from './util/constants';
 import TagManagerPlugin from './plugins/analytics-plugin-tag-manager';
 import TagDataPlugin from './plugins/analytics-plugin-tag-manager';
 import AdobeViaTealium from './plugins/adobe-analytics-via-tealium';
@@ -99,11 +101,21 @@ if(!window.Analytics) {
     page: [],
     customEvent: []
   }
-
+  
   window.Analytics = analytics
+  // Listen for configurations published by features/components.
+  Pubsub.observe(ANALYTICS_OBSERVER_TYPE.CONFIGURE).subscribe(( data) => {
+    console.log( 'ANALYTICS_OBSERVER_TYPE.CONFIGURE: ', data);
+    
+    if(data.type == 'configure') {
+      //add tracking config for feature.
+      if(data.domEvents) {
+        AnalyticsController.trackDomEvents(data.domEvents); 
 
+      }
+    }
+  });
 }
 
-// start listeners...
 /* export analytics for usage through the app */
 export default window.Analytics;

@@ -15,3 +15,5 @@ class AnalyticsValidator {
     }
   }
 }
+
+export default AnalyticsValidator

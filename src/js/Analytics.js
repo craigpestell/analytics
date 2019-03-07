@@ -171,8 +171,9 @@ export default class AnalyticsController {
           const eventName = ev[0];
           const handler = ev[1];
           
-          const elList = (config.selectorIsId) ? [document.getEfementById(selector)] : document.querySelectorAll(selector);
-          for(i = 0; i < elList.length; i++){
+          const elList = (config.selectorIsId) ? [document.getElementById(selector)] : document.querySelectorAll(selector);
+          for (var el in elList) {
+          // for(i = 0; i < elList.length; i++){
             let el = elList[i];
             if(!el.analytics){
               el.analytics = {events: {}};
@@ -185,9 +186,15 @@ export default class AnalyticsController {
             }     
 
             el.track = track;
-            el.addEventListener(eventName, (e) => {
-              el.track(eventName, {'tracking': 'data'})
-            })
+            if(eventName === 'click') {
+              const clickEventListener  = AnalyticsController.getClickEventListener(config);
+              el.addEventListener(eventName, clickEventListener); // <---
+            }else{
+              el.addEventListener(eventName, (e) => {
+                el.track(eventName, {'tracking': 'data'})
+              })
+            }
+
           }
         })
       }
@@ -307,8 +314,8 @@ export default class AnalyticsController {
    */
   static get navigateToHref() { return true; }
 
-  getClickEventListener(config) {
-    const trackLink = this.analytics.track;
+  static getClickEventListener(config) {
+    const trackLink = window.Analytics.track;
 
     return function clickListener(e) {
       let navigateToHref = false;

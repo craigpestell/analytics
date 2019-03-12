@@ -172,9 +172,7 @@ export default class AnalyticsController {
           const handler = ev[1];
           
           const elList = (config.selectorIsId) ? [document.getElementById(selector)] : document.querySelectorAll(selector);
-          for (var el in elList) {
-          // for(i = 0; i < elList.length; i++){
-            let el = elList[i];
+          elList.forEach((el) => {
             if(!el.analytics){
               el.analytics = {events: {}};
             }
@@ -195,7 +193,8 @@ export default class AnalyticsController {
               })
             }
 
-          }
+          })
+          
         })
       }
       //document.on(config.eventName, config)
@@ -324,18 +323,19 @@ export default class AnalyticsController {
         navigateToHref = AnalyticsController.navigateToHref;
       }
 
-      async function fetchAnalytics(fetchDataPromises) {
-        const result = [];
-        for (let i = 0; i < fetchDataPromises.length; i++) {
-          const r = await fetchDataPromises[i](e);
-          result.push(r);
+      async function fetchAnalytics(data) {
+        let result = {};
+        const entries = Object.entries(data)
+        for (let i = 0; i < entries.length; i++) {
+          const r = await entries[i][1](e);
+          Object.assign(result,{[entries[i][0]]: r});
         }
         return result;
       }
 
-      fetchAnalytics(Object.values(config.data || {})).then((result) => {
-        trackLink(e.target.tagName + 'click', result);
-        // AnalyticsController.fireTag('link', result);
+      fetchAnalytics(config.data || {}).then((result) => {
+        trackLink(e.currentTarget.tagName + ':click', result);
+        
         if (navigateToHref) {
           window.location.href = e.target.closest('a').href;
         }

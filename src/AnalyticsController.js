@@ -3,7 +3,7 @@ import AnalyticsController from './js/Analytics';
 import Pubsub from '@component/common/src/util/PublishSubscribe';
 import { ANALYTICS_OBSERVER_TYPE } from './util/constants';
 import TagManagerPlugin from './plugins/analytics-plugin-tag-manager';
-import TagDataPlugin from './plugins/analytics-plugin-tag-manager';
+// import TagDataPlugin from './plugins/analytics-plugin-tag-manager';
 import AdobeViaTealium from './plugins/adobe-analytics-via-tealium';
 import lifecycleExample from './plugins/analytics-plugin-lifecycle-example'
 import loggerPlugin from './plugins/logger-plugin';
@@ -86,11 +86,11 @@ if(!window.Analytics) {
       AdobeViaTealium(),
       lifecycleExample(),
       loggerPlugin,
-      visualizeLifecycle
-      /* TagManagerPlugin({
+      visualizeLifecycle,
+      TagManagerPlugin({
         env: 'dev', 
         brand: options.brand || 'bcom'
-      }),*/
+      }),
       // TagDataPlugin
     ]
   })

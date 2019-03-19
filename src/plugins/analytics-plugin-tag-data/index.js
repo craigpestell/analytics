@@ -5,6 +5,8 @@
 //  the tag.
 import ExpSDK from '@component/experiment';
 
+import AnalyticsService from '../../js/AnalyticsService';
+
 // const ExpSdk = new ExperimentationSDK();
 
 const tagData = store => next => action => {
@@ -15,13 +17,11 @@ const tagData = store => next => action => {
     
     if(action.type == "initializeStart") {
       console.log('initializing Analytics...');
-      Object.assign(action, {});
-      return action;
-    }
+      // TODO: dispatch custom event to be handled here instead of initializeStart to fetch Experiment recipes & other 
+      // data needed for page views. We want to trigger this event either server-side or client-side depending on the app.
 
-
-    if(action.type == "pageStart") {
       asyncResponse = true;
+      console.log('pageStart: fetching experiment recipes...')
       // add experiment_ids
       ExpSDK.getFinalClientRecipes().then((recipes) => {
         return next({
@@ -32,6 +32,11 @@ const tagData = store => next => action => {
         });
       });
 
+    }
+
+
+    if(action.type == "pageStart") {
+    
     }
 
   }

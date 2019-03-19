@@ -46,18 +46,22 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
     },
 
     /*
-    triggers: {
+    triggers: { 
       'click .bar-button': 'click:barButton'
     },
     */
     
     ui: {
         callToAction: '.cta-primary',
-        callToActionSecondary: '.cta-secondary'
+        callToActionSecondary: '.cta-secondary',
+        track: '.track'
     },
+    
     events: {
         'click @ui.callToAction': 'onClickCta',
         'click @ui.callToActionSecondary': 'onClickCtaSecondary',
+        'click .cta-primary': 'onClickCta',
+        'click .track': 'onClickTrack'
     },
     
     triggers: {
@@ -65,14 +69,17 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
         'analytics:cta': 'onCta',
         'analytics:ctaSuccess': 'onCtaSuccess',
     },
+    
     onCta() {
         console.log('$$$$CTA');
         this.view.trigger('analytics', {'cta': 'data'});
     },
+    
     // analytics:ctaSuccess
     onCtaSuccess(){
         console.log('Thumbnail onAnalyticsCtaSuccess');
     },
+    
     onRender() {
         const args = arguments;
         console.log('viewBehavior onRender args:', arguments)
@@ -83,26 +90,44 @@ const AnalyticsViewBehavior = Mn.Behavior.extend({
     modelEvents: {
         'change': 'onChangeModel'
     },
+
     collectionEvents: {
         'change': 'onChangeCollection'
     },
+
     onClickCta(evt) {
         // Primary call-to-action link click.
-        Analytics.track('link', evt);
+        Analytics.track('link', {event_name: 'call to action'});
     },
+
     onClickCtaSecondary(evt) {
         // Primary call-to-action link click.
         Analytics.track('link', evt);
     },
 
+    onClickTrack(evt) {
+        const element = evt.currentTarget;
+        // Handle all predefined click events.
+
+        // .track-product
+        if (element.classList.contains('track-product')) {
+            // product:clicked modeled after https://segment.com/docs/spec/ecommerce/v2/ Core Ordering Overview / Product Clicked
+            Analytics.track('product:clicked', evt.currentTarget);
+        } else {
+            Analytics.track('link', evt);
+        }
+    },
+
     onClickBarButton(view, evt) {
         // ..
     },
+    
     onChangeModel(model, opts) {
         // ..
         console.log('model changed:', model, 'opts: ', opts);
         this.pubsub.trigger('analytics:track:model:change', evt);
     },
+    
     onChangeCollection(model, opts) {
         // ..
         this.pubsub.trigger('analytics:track:collection:change', evt);

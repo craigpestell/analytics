@@ -47,6 +47,7 @@
     "@component/common": "^1.248.0",
     "@component/experiment": "^0.7.0",
     "analytics": "0.0.21",
+    "benchmark": "^2.1.4",
     "parameter-validator": "^1.0.5",
     "prfun": "^2.1.5"
   }

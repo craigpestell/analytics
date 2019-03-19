@@ -3,7 +3,7 @@ import AnalyticsController from './js/Analytics';
 import Pubsub from '@component/common/src/util/PublishSubscribe';
 import { ANALYTICS_OBSERVER_TYPE } from './util/constants';
 import TagManagerPlugin from './plugins/analytics-plugin-tag-manager';
-// import TagDataPlugin from './plugins/analytics-plugin-tag-manager';
+import TagDataPlugin from './plugins/analytics-plugin-tag-data';
 import AdobeViaTealium from './plugins/adobe-analytics-via-tealium';
 import lifecycleExample from './plugins/analytics-plugin-lifecycle-example'
 import loggerPlugin from './plugins/logger-plugin';
@@ -14,7 +14,7 @@ const options = {brand: 'mcom', debug: true};
 function listenerPlugin(userConfig) {
   
   return {
-    NAMESPACE: 'analytics',
+    NAMESPACE: 'macys-analytics',
     bootstrap: ({ payload, config, instance }) => {
       // Do whatever on `bootstrap`
       // all non-anchor element links on marketing-campaigns (have data attribute 'linktrack')
@@ -83,7 +83,8 @@ if(!window.Analytics) {
     version: 100,
     plugins: [
       listenerPlugin(),
-      AdobeViaTealium(),
+      TagDataPlugin,
+      AdobeViaTealium,
       lifecycleExample(),
       loggerPlugin,
       visualizeLifecycle,

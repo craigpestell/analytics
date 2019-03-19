@@ -20,5 +20,6 @@ const publishAnalyticsConfig = (options = {}) => {
  * @see module:@component/analytics
  */
 const Analytics = AnalyticsController;
+
 export { AnalyticsValidator, AnalyticsViewBehavior, publishAnalyticsConfig };
 export default Analytics;

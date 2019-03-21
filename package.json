@@ -1,0 +1,60 @@
+{
+  "name": "@component/analytics",
+  "description": "",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git@code.devops.fds.com:polaris/component/analytics.git"
+  },
+  "config": {
+    "environment": [
+      {
+        "name": "key1",
+        "local": {
+          "mcom": "value1",
+          "bcom": "value2"
+        },
+        "prod": {
+          "mcom": "__VALUE3__",
+          "bcom": "__VALUE4__"
+        }
+      },
+      {
+        "name": "XAPI_HOST",
+        "local": {
+          "mcom": "https://mcom.xapi.com",
+          "bcom": "https://bcom.xapi.com"
+        },
+        "prod": {
+          "mcom": "__VALUE5__",
+          "bcom": "__VALUE6__"
+        }
+      }
+    ]
+  },
+  "engines": {
+    "node": "8.x",
+    "npm": "5.x"
+  },
+  "main": "src/analytics.js",
+  "devDependencies": {
+    "@core/dev-server": "^1.0.0",
+    "@core/lib": "^1.0.0",
+    "@core/server": "^1.0.0",
+    "lodash": "^4.17.4"
+  },
+  "dependencies": {
+    "@component/common": "^1.248.0",
+    "@component/experiment": "^0.7.0",
+    "analytics": "0.0.21",
+    "benchmark": "^2.1.4",
+    "immutable": "^4.0.0-rc.12",
+    "parameter-validator": "^1.0.5",
+    "prfun": "^2.1.5",
+    "redux-analytics": "^0.3.1",
+    "redux-logger": "^3.0.6",
+    "redux-promise-middleware": "^6.1.0",
+    "redux-stack": "^1.0.1",
+    "redux-thunk": "^2.3.0"
+  }
+}

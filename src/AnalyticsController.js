@@ -2,6 +2,7 @@ import Analytics from 'analytics'
 import AnalyticsController from './js/Analytics';
 import Pubsub from '@component/common/src/util/PublishSubscribe';
 import { ANALYTICS_OBSERVER_TYPE } from './util/constants';
+import configureStore from './js/redux/configureStore';
 import TagManagerPlugin from './plugins/analytics-plugin-tag-manager';
 import TagDataPlugin from './plugins/analytics-plugin-tag-data';
 import AdobeViaTealium from './plugins/adobe-analytics-via-tealium';
@@ -76,6 +77,8 @@ function listenerPlugin(userConfig) {
 
 if(!window.Analytics) {
   /* initialize analytics and load plugins */
+  const store = configureStore();
+  
   const analytics = Analytics({
     // debug: options && options.debug,
     exposeRedux: true,
@@ -111,7 +114,7 @@ if(!window.Analytics) {
     if(data.type == 'configure') {
       //add tracking config for feature.
       if(data.domEvents) {
-        AnalyticsController.trackDomEvents(data.domEvents); 
+        AnalyticsController.trackDomEvents(data.domEvents, store); 
 
       }
     }

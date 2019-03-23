@@ -2,6 +2,7 @@ import Analytics from 'analytics';
 
 // import pubsub from '@component/common/src/util/PublishSubscribe';
 
+
 import TagDataPlugin from '../plugins/analytics-plugin-tag-data';
 import TagManagerPlugin from '../plugins/analytics-plugin-tag-manager';
 import { validate, ParameterValidationError } from 'parameter-validator';
@@ -42,7 +43,10 @@ import AnalyticsService from './AnalyticsService';
 
 const EVENTS = {view: undefined, link: undefined};
 
-/** 
+
+
+
+/**
  * Analytics
  * This class is used to add Analytics tracking events.
  */
@@ -60,7 +64,7 @@ export default class AnalyticsController {
       config = defaultConfig;
     }
     this.eventDataHandlers = config.eventDataHandlers || [];
-    
+
     this.domEvents = config.domEvents || {};
         // Must provide channel
     try {
@@ -71,11 +75,11 @@ export default class AnalyticsController {
         // "Invalid value of 'undefined' was provided for parameter 'options.channel'."
         return false;
       }
-    
+
     }
-    
+
     this.dataMap =  options.dataMap || undefined;
-    
+
     this.defaultAnalyticsDataMap = this.defaultAnalyticsDataMap.bind(this);
     this.addEventListeners = this.addEventListeners.bind(this);
     this.getClickEventListener = this.getClickEventListener.bind(this);
@@ -93,7 +97,7 @@ export default class AnalyticsController {
     });
 
     this.analytics = this.initAnalytics({debug: true, channel: options.channel});
-    
+
   }
 
   initAnalytics(options = {debug: false}) {
@@ -104,13 +108,13 @@ export default class AnalyticsController {
       version: 100,
       plugins: [
         TagManagerPlugin({
-          env: 'dev', 
+          env: 'dev',
           brand: options.brand || 'bcom'
         }),
         TagDataPlugin
       ]
     })
-    
+
     // set up app channel pubsub communication with analytics pubsub
     options.channel.on('analytics:track', (payload) => {
       this.analytics.dispatch({type: 'analytics:track', payload});
@@ -122,7 +126,7 @@ export default class AnalyticsController {
     })
 
     options.channel.on('analytics:configure', (data) => {
-      
+
       console.log('app channel received analytics configuration data: ' ,data);
       this.analytics.dispatch({type: 'analytics:configure', data});
     });
@@ -138,7 +142,7 @@ export default class AnalyticsController {
       console.log('$$$$$$$$$$$$$ adding tag: ', config);
       this.addTag(config);
     }) */
-    
+
     this.analytics.on('analytics:view:initialize', ( payload ) => {
       console.log('inside analytics:view:initialize listener');
     });
@@ -147,7 +151,7 @@ export default class AnalyticsController {
       console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$   initializeStart event');
       this.analytics.dispatch({type: 'analytics::configuration', payload: config});
     });
-    
+
     this.analytics.on('analytics::*', ({payload}) => {
       console.log(`########## analytics::* listener ${payload.type}`);
     });
@@ -156,13 +160,13 @@ export default class AnalyticsController {
       console.log('analytics:track, with payload:', payload);
       this.trackEvent(payload.tag);
     })
-    
+
     this.analytics.on('analytics:configure', ({payload}) => {
       console.log('received configure data:', payload)
     })
   }
 
-  static trackDomEvents(domEvents){
+  static trackDomEvents(domEvents, store){
     const derivedEvents = domEvents;
     derivedEvents.forEach((config) =>{
       const {selector, events} = config;
@@ -170,7 +174,7 @@ export default class AnalyticsController {
         Object.entries(events).forEach((ev) => {
           const eventName = ev[0];
           const handler = ev[1];
-          
+
           const elList = (config.selectorIsId) ? [document.getElementById(selector)] : document.querySelectorAll(selector);
           elList.forEach((el) => {
             if(!el.analytics){
@@ -181,11 +185,11 @@ export default class AnalyticsController {
             const track = (eventName, payload, options, callback) => {
               el.analytics.events[eventName].fired = true;
               window.Analytics.track(eventName, payload, options, callback);
-            }     
+            }
 
             el.track = track;
             if(eventName === 'click') {
-              const clickEventListener  = AnalyticsController.getClickEventListener(config);
+              const clickEventListener  = AnalyticsController.getClickEventListener(config, store);
               el.addEventListener(eventName, clickEventListener); // <---
             }else{
               el.addEventListener(eventName, (e) => {
@@ -194,19 +198,19 @@ export default class AnalyticsController {
             }
 
           })
-          
+
         })
       }
       //document.on(config.eventName, config)
     });
   }
-  
+
 
   /**
    * Configure tracking events to fire for all elements matching a CSS selector.
    * This can be called to add subsequent configurations after an initial bootstrap,
    * or to track an event after instantiating a view client-side.
-   * 
+   *
    * @param {Object} config - Tag configuration.
    */
   trackEvents(config) {
@@ -230,7 +234,7 @@ export default class AnalyticsController {
 
   /**
    * DOMElements matched by configuration CSS selectors.
-   * 
+   *
    * @returns {Set<DOMElement>} Elements tagged, matched by CSS selectors in config.
    */
   get taggedElements() {
@@ -249,12 +253,12 @@ export default class AnalyticsController {
 
   /**
    * Handler used to fetch data for Analytics entity.  Can be overwritten by configuration.
-   * @param {Object} entity - entity to fetch data for. 
+   * @param {Object} entity - entity to fetch data for.
    */
   defaultAnalyticsDataMap(entity) {
-    
+
     if(AnalyticsService[entity.name]) {
-      return AnalyticsService[entity.name](); 
+      return AnalyticsService[entity.name]();
     }
     const defaultHandler = (e) => {
       const data = { event_name: 'generic' };
@@ -268,7 +272,7 @@ export default class AnalyticsController {
     }
 
     /* if (entity.name === 'experiment') {
-      //ExperimentSDK.getAllSelectedRecipes().always( function ( recipes ) { 
+      //ExperimentSDK.getAllSelectedRecipes().always( function ( recipes ) {
       return new Promise((resolve) => {
         ExperimentSDK.getAllSelectedRecipes().always(function (recipes) {
           resolve(recipes);
@@ -286,7 +290,7 @@ export default class AnalyticsController {
       };
       return fetchProduct;
     }
-    
+
     return defaultHandler;
   };
 
@@ -313,7 +317,7 @@ export default class AnalyticsController {
    */
   static get navigateToHref() { return true; }
 
-  static getClickEventListener(config) {
+  static getClickEventListener(config, store) {
     const trackLink = window.Analytics.track;
 
     return function clickListener(e) {
@@ -327,15 +331,15 @@ export default class AnalyticsController {
         let result = {};
         const entries = Object.entries(data)
         for (let i = 0; i < entries.length; i++) {
-          const r = await entries[i][1](e);
+          const r = await store.dispatch( { type: 'REQUEST_POSTS', promise: entries[i][1](e), entity: entries[i][0] } );
           Object.assign(result,{[entries[i][0]]: r});
         }
         return result;
       }
-
+      
       fetchAnalytics(config.data || {}).then((result) => {
         trackLink(e.currentTarget.tagName + ':click', result);
-        
+
         if (navigateToHref) {
           window.location.href = e.target.closest('a').href;
         }
@@ -345,10 +349,10 @@ export default class AnalyticsController {
       });
     }
   };
-  
+
   getImpressionEventListener(config) {
     const trackImpression = this.analytics.track;
-    
+
     function impressionListener (e) {
       let { data = {} } = config;
       this.fetchDataMap(e).then((result) => {
@@ -377,7 +381,7 @@ export default class AnalyticsController {
       }
 
       fetchAnalytics(Object.values(config.data || {})).then((result) => {
-        
+
         trackImpression('impression......', result);
 
       }, (reason) => {
@@ -388,19 +392,19 @@ export default class AnalyticsController {
 
    */
 
-  /** 
+  /**
    * Validate individual tag configuration.
-   * 
+   *
    * @param {Object} config - The tag configuration to validate.
-   * @param {string} config.selector - CSS selector to query DOMElements to apply tag configuration. 
+   * @param {string} config.selector - CSS selector to query DOMElements to apply tag configuration.
    * @param {Object} config.events - Events to trigger tag.
-   * @param {anything} [config.events.view] - If defined, tag will trigger when DOMElements queried in 
+   * @param {anything} [config.events.view] - If defined, tag will trigger when DOMElements queried in
    *                                        selector are viewed - this may happen server or client-side.
    * @param {anything} [config.events.link] - If defined, tag will be triggered on 'click' event.
    * @param {anything} [config.events.impression] - If defined, tag will be triggered when viewed. TODO : - merge with 'view' event - only top-most tagged element will have view event in adobe.
-   * 
+   *
    * @throws {ParameterValidationError} Error for invalid configuration options.
-   * 
+   *
    * @returns {?Object} validated configuration
    */
   static validateTagConfig(config) {
@@ -430,11 +434,11 @@ export default class AnalyticsController {
     });
     return true;
   };
-  
+
   addEventListeners(analyticsDataMap) {
     // const fetchDataMap = (dataHashMap) => (Promise.all(dataHashMap.map((p) => (resolvedDataMap(p)))))
     const trackPage = this.analytics.page;
-    
+
     const fireViewEvent = (config) => {
       let { data = {} } = config;
 
@@ -514,10 +518,10 @@ export default class AnalyticsController {
               console.log(`analytics listener ${eventLabel} with payload: ${payload.type}`)
               //this.analytics.on(`analytics:custom-event::${eventLabel}`, ({ payload }) => {
               //  console.log(`analytics custom-event listener ${eventLabel} with payload: ${payload.type}`)
-              //}) 
-              
+              //})
+
             })
-            this.analytics.track(`analytics:custom-event::${eventLabel}`, {test: 'payload', data}) 
+            this.analytics.track(`analytics:custom-event::${eventLabel}`, {test: 'payload', data})
           })
         });
       }

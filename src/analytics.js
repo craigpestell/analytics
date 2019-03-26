@@ -1,6 +1,5 @@
 import {createStore, combineReducers} from 'redux';
 import {buildStack} from 'redux-stack';
-import ReduxWatcher from 'redux-watcher'
 import {ACTIONS} from './util';
 import {Analytics as AnalyticsActions} from './actions';
 
@@ -9,6 +8,12 @@ import stack from './initializers';
 export {default as AnalyticsBehavior} from './AnalyticsBehavior';
 export {default as AnalyticsService} from './AnalyticsService';
 export {ACTIONS, EVENTS} from './util';
+
+const TagManagerUtil = {
+  fireTag(type, data){
+    console.log('firing tag:', {type, data});
+  }
+}
 
 const initialState = {};
 const {reducers, enhancer} = buildStack (stack);
@@ -41,44 +46,46 @@ const controller = {
     const {el} = value;
   },
   addEventListener: (elSelector, event, dataMap) => {
-    const el = document.querySelector(elSelector);
+    const el = document.querySelector (elSelector);
     switch (event) {
       case 'click':
-        // store eventlistener config (step 1)
-        
-        const trackClickEventListener = (e) => {
-            const keys = Object.keys(dataMap);
-            const values = keys.map(key => dataMap[key]);
-            
-            store.dispatch ({
+        const trackClickEventListener = e => {
+          const keys = Object.keys (dataMap);
+          const values = keys.map (key => dataMap[key]);
+
+          // where all the magic happens.
+          store.dispatch ({
               type: ACTIONS.Analytics.fetchMap.toString(),
-              payload: Promise.all(values).then(resolved_values => {
-                const resolved_hash = {};
-                keys.forEach((key, index) => {
-                  resolved_hash[key] = resolved_values[index](e);
+              payload: Promise.all (values).then (resolvedValues => {
+                const resolvedHash = {};
+                keys.forEach ((key, index) => {
+                  resolvedHash[key] = resolvedValues[index] (e);
                 });
-                return resolved_hash;
-              })
+                return resolvedHash;
+              }),
             })
-              
             .then (({value, action}) => {
               return store.dispatch ({
-                type: ACTIONS.Analytics.track.toString(),
+                type: ACTIONS.Analytics.track.toString (),
                 payload: new Promise (resolve =>
                   resolve ({el, event, fetchedData: value})
                 ),
-              })
-            
-              // onAddEventListenerSuccess ({value, action});
+              });
             })
-        }
-      
-        el.addEventListener (
-          'click',
-          trackClickEventListener
-        );
-        return true;    
-      
+            .then (({value, action}) => {
+
+              console.log ('after track: ', {value, action});
+              const {event, fetchedData} = action.payload;
+              const tealiumEvent = (event === 'click' ? 'link': 'vien');
+              TagManagerUtil.fireTag(tealiumEvent, fetchedData)
+            });
+
+          // onAddEventListenerSuccess ({value, action});
+        };
+
+        el.addEventListener ('click', trackClickEventListener);
+        return true;
+
       default:
         return;
     }
@@ -86,6 +93,7 @@ const controller = {
   track: (type, data) => {
     // call TagManagerUtil for now..
     console.log ('CALL TagManagerUtil.fireTag(', type, ', ', data, ')');
+    TagManagerUtil.fireTag(type, data);
   },
 };
 

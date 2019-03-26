@@ -10,11 +10,15 @@
 import { applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { createPromise } from 'redux-promise-middleware';
-const promise = createPromise({ types: { fulfilled: 'success' } });
+import promiseMiddleware from 'redux-promise-middleware';
+
+//const promise = createPromise({ types: { fulfilled: 'success' } });
 
 const middleware = [
-  promise,
+  //promise,
   thunk,
+  promiseMiddleware,
+  
 ]
 
 export default {

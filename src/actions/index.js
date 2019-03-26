@@ -1,5 +1,5 @@
+import ACTIONS from '../util/actions';
+import * as Analytics from './analytics';
 import * as Product from './product';
 
-const ACTIONS = Object.freeze({Product});
-console.log('ACTIONS:' ,ACTIONS);
-export default ACTIONS;
+export {Analytics, Product};

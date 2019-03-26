@@ -1,10 +1,8 @@
 import enumValue from './enumValue';
 
-const ANALYTICS_OBSERVER_TYPE = Object.freeze({
+export const OBSERVER_TYPE = Object.freeze({
   CONFIGURE: enumValue("configure")
 });
 
 
-export default { ANALYTICS_OBSERVER_TYPE };
-
-
+export default { OBSERVER_TYPE };

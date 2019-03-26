@@ -9,11 +9,13 @@
 // you would only need to remove that initializer file.
 //
 
+import analytics from '../reducers/analytics';
 import product from '../reducers/product';
 // import settings from '@/modules/settings/state'
 // import intro from '@/modules/intro/state'
 
 const reducers = {
+  analytics,
   product,
   // settings,
   // intro,

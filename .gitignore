@@ -1,0 +1,10 @@
+.git
+.idea
+*.swp
+.DS_Store
+sonar-project.properties
+
+/node_modules
+/npm-debug.log
+/dist
+/index.hbs

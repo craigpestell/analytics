@@ -1,6 +1,6 @@
 import enumValue from './enumValue';
 
-export const EVENTS = Object.freeze({
+export default Object.freeze({
     //DOM events
     DOM: {
       Element: {
@@ -31,7 +31,3 @@ export const EVENTS = Object.freeze({
       fetchFailed: enumValue('EVENT.QuickView.fetchFailed'),
     }
   });
-  
-
-  
-  export default { EVENTS };

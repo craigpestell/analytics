@@ -1,28 +1,94 @@
-import { createStore, combineReducers } from 'redux';
-import { buildStack } from 'redux-stack';
-import {ANALYTICS_OBSERVER_TYPE} from './util/constants';
-export { default as AnalyticsBehavior } from './AnalyticsBehavior';
+import {createStore, combineReducers} from 'redux';
+import {buildStack} from 'redux-stack';
+import ReduxWatcher from 'redux-watcher'
+import {ACTIONS} from './util';
+import {Analytics as AnalyticsActions} from './actions';
+
 import stack from './initializers';
 
-const initialState = {}
-const { reducers, enhancer } = buildStack(stack)
-const store = createStore(combineReducers(reducers), initialState, enhancer)
+export {default as AnalyticsBehavior} from './AnalyticsBehavior';
+export {default as AnalyticsService} from './AnalyticsService';
+export {ACTIONS, EVENTS} from './util';
 
-export default store;
+const initialState = {};
+const {reducers, enhancer} = buildStack (stack);
+const store = createStore (combineReducers (reducers), initialState, enhancer);
 
+const controller = {
+  dispatch: store.dispatch,
+  configure: config => {
+    Object.entries (config).map (([key, value]) => {
+      const type = `ACTIONS.Analytics.${key}`;
+      switch (type) {
+        case ACTIONS.Analytics.domEvents.toString ():
+          AnalyticsActions.domEvents (value);
+          return;
+        default:
+          return;
+      }
+    });
+  },
 
-export const publishAnalyticsConfig = (config) => {
-    Pubsub.observe(ANALYTICS_OBSERVER_TYPE.CONFIGURE).subscribe(( data) => {
-        console.log( 'ANALYTICS_OBSERVER_TYPE.CONFIGURE: ', data);
+  // add one or possibly more event listeners to track.  options.events is a object map of dom events to track (or functions to resolve to elements to track???)
+  addEventListeners: config => {
+    return store.dispatch ({
+      type: AnalyticsActions.domEvents.toString (),
+      payload: config,
+    });
+  },
+  onAddEventListenerSuccess: (value, action) => {
+    console.log ('eventListenerSuccess data:', value);
+    const {el} = value;
+  },
+  addEventListener: (elSelector, event, dataMap) => {
+    const el = document.querySelector(elSelector);
+    switch (event) {
+      case 'click':
+        // store eventlistener config (step 1)
         
-        if(data.type == 'configure') {
-          //add tracking config for feature.
-          if(data.domEvents) {
-            AnalyticsController.trackDomEvents(data.domEvents, store); 
-    
-          }
+        const trackClickEventListener = (e) => {
+            const keys = Object.keys(dataMap);
+            const values = keys.map(key => dataMap[key]);
+            
+            store.dispatch ({
+              type: ACTIONS.Analytics.fetchMap.toString(),
+              payload: Promise.all(values).then(resolved_values => {
+                const resolved_hash = {};
+                keys.forEach((key, index) => {
+                  resolved_hash[key] = resolved_values[index](e);
+                });
+                return resolved_hash;
+              })
+            })
+              
+            .then (({value, action}) => {
+              return store.dispatch ({
+                type: ACTIONS.Analytics.track.toString(),
+                payload: new Promise (resolve =>
+                  resolve ({el, event, fetchedData: value})
+                ),
+              })
+            
+              // onAddEventListenerSuccess ({value, action});
+            })
         }
-      });
+      
+        el.addEventListener (
+          'click',
+          trackClickEventListener
+        );
+        return true;    
+      
+      default:
+        return;
+    }
+  },
+  track: (type, data) => {
+    // call TagManagerUtil for now..
+    console.log ('CALL TagManagerUtil.fireTag(', type, ', ', data, ')');
+  },
 };
 
+export {controller as AnalyticsController, store};
 
+export default store;

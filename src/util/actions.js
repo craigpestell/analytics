@@ -1,29 +1,38 @@
 import enumValue from './enumValue';
 
-export const ACTIONS = Object.freeze({
+export default Object.freeze({
     //DOM events
-    DOM: {
+     /*DOM: {
       Element: {
-        click: enumValue('ACTION.DOM.Element.click'),
+        click: enumValue('ACTIONS.DOM.Element.click'),
        }
     },
     Marionette: {
         view: {
-            rendered: enumValue('ACTION.Marionette.view.rendered')
+            render: enumValue('ACTIONS.Marionette.view.render')
         }
     },
-
-    
+    */
     Product: {
-        fetch: enumValue('ACTION.Product.fetch'),
-        view:  enumValue('ACTION.Product.view'),
+        fetch: enumValue('ACTIONS.Product.fetch'),
+        view:  enumValue('ACTIONS.Product.view'),
     },
+
     QuickView: {
-        fetch: enumValue('ACTION.QuickView.fetch'),
-        view: enumValue('ACTION.QuickView.view.render'),        
+        fetch: enumValue('ACTIONS.QuickView.fetch'),
+        view: enumValue('ACTIONS.QuickView.view.render'),        
+    },
+
+    // Yes, Analytics has ACTIONSs too. This way we get to track the state of analytics configurations and events in redux.
+    Analytics: {
+        configure: enumValue('ACTIONS.Analytics.configure'),
+        addEventListener: enumValue('ACTIONS.Analytics.addEventListener'),
+        domEvents: enumValue('ACTIONS.Analytics.domEvents'),
+        fetchMap: enumValue('ACTIONS.Analytics.fetchMap'), 
+        fetchEntity: enumValue('ACTIONS.Analytics.fetchEntity'), 
+        // requestProduct: enumValue('ACTIONS.Analytics.requestProduct'), 
+        page: enumValue('ACTIONS.Analytics.page'),
+        track: enumValue('ACTIONS.Analytics.track')
     }
   });
-  
-
-  export default { ACTIONS }
-  
+``

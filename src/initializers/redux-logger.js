@@ -8,7 +8,7 @@
 let __DEV__ = process.env.__DEV__ || true;
 
 import { createLogger } from 'redux-logger'
-import {fromJS} from 'immutable'
+import { fromJS } from 'immutable'
 import { applyMiddleware } from 'redux'
 
 // log actions in development mode

@@ -9,13 +9,15 @@
 //
 import { applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
-import { createPromise } from 'redux-promise-middleware';
 import promiseMiddleware from 'redux-promise-middleware';
+import analyticsMiddleware from './analyticsMiddleware';
+import tagManagerUtilMiddleware from './tagManagerUtilMiddleware';
 
-//const promise = createPromise({ types: { fulfilled: 'success' } });
+console.log( {tagManagerUtilMiddleware,promiseMiddleware,analyticsMiddleware});
 
 const middleware = [
-  //promise,
+  analyticsMiddleware,
+  tagManagerUtilMiddleware,
   thunk,
   promiseMiddleware,
   

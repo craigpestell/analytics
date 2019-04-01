@@ -10,10 +10,10 @@ export {default as AnalyticsService} from './AnalyticsService';
 export {ACTIONS, EVENTS} from './util';
 
 const TagManagerUtil = {
-  fireTag(type, data){
-    console.log('firing tag:', {type, data});
-  }
-}
+  fireTag (type, data) {
+    console.log ('firing tag:', {type, data});
+  },
+};
 
 const initialState = {};
 const {reducers, enhancer} = buildStack (stack);
@@ -54,8 +54,9 @@ const controller = {
           const values = keys.map (key => dataMap[key]);
 
           // where all the magic happens.
-          store.dispatch ({
-              type: ACTIONS.Analytics.fetchMap.toString(),
+          store
+            .dispatch ({
+              type: ACTIONS.Analytics.fetchMap.toString (),
               payload: Promise.all (values).then (resolvedValues => {
                 const resolvedHash = {};
                 keys.forEach ((key, index) => {
@@ -67,17 +68,24 @@ const controller = {
             .then (({value, action}) => {
               return store.dispatch ({
                 type: ACTIONS.Analytics.track.toString (),
+                meta: {
+                  analytics: {
+                    type: 'my-analytics-event',
+                    payload: new Promise (resolve =>
+                      resolve ({el, event, fetchedData: value})
+                    )
+                  }
+                },
                 payload: new Promise (resolve =>
                   resolve ({el, event, fetchedData: value})
-                ),
+                )
               });
             })
             .then (({value, action}) => {
-
               console.log ('after track: ', {value, action});
               const {event, fetchedData} = action.payload;
-              const tealiumEvent = (event === 'click' ? 'link': 'vien');
-              TagManagerUtil.fireTag(tealiumEvent, fetchedData)
+              const tealiumEvent = event === 'click' ? 'link' : 'vien';
+              TagManagerUtil.fireTag (tealiumEvent, fetchedData);
             });
 
           // onAddEventListenerSuccess ({value, action});
@@ -93,7 +101,7 @@ const controller = {
   track: (type, data) => {
     // call TagManagerUtil for now..
     console.log ('CALL TagManagerUtil.fireTag(', type, ', ', data, ')');
-    TagManagerUtil.fireTag(type, data);
+    TagManagerUtil.fireTag (type, data);
   },
 };
 

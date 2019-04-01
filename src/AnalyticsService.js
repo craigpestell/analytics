@@ -18,12 +18,12 @@ const experiment = _.memoize(() => {
       })
 });
 
-
 const product = _.memoize((pId) => {
   console.log('fetching productId: ', pId);
-    return fetch(`https://www.macys.com/xapi/discover/v1/product?productIds=${pId}&_application=SITE&_navigationType=SEARCH&_deviceType=DESKTOP&_shoppingMode=SITE&_regionCode=US&_customerExperiment=NO_EXPERIMENT&currencyCode=USD&_customerState=GUEST&clientId=QV`);
-    // return new Promise((resolve) => { resolve({productId: pId, productName: 'test product from analytics service'})})
-    
+    return fetch(`http://localhost:4111/xapi/product/${pId}`)
+    .then((res) => {
+      return res.json();
+    });
 });
 
 const quickView = (response, brand) => {

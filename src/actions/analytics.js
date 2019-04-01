@@ -5,8 +5,8 @@ import {
 
 import store from '../analytics';
 
-import {ACTIONS} from '../util';
-import {AnalyticsController} from '../analytics';
+import { ACTIONS } from '../util';
+import { AnalyticsController } from '../analytics';
 import CssSelectorGenerator from 'css-selector-generator';
 
 export const foo = createAction ('FOO', num => num);
@@ -69,29 +69,36 @@ const bar = () => ({
 })
 
 export const fetchMap = dataMap => {
-  console.log('fetchMap Action dataMap:', dataMap)
-    return dispatch => {
-      return dispatch ({
-        type: ACTIONS.Analytics.fetchMap.toString (),
-        payload: Promise.all (
-          dataMap.map (([value, key]) => {
-            console.log ('track promise.all value,key:', value, key);
-          })
-        ),
-      }).then (() => dispatch (bar ()));
-    }
-};
+  function fetchMapAction(dataMap) {
+    return store.dispatch({
+      type: ACTIONS.Analytics.fetchMap.toString (),
+      payload: Promise.all (
+        dataMap.map (([value, key]) => {
+          console.log ('track promise.all value,key:', value, key);
+        })
+      ),
+    }).then (() => dispatch (bar ()));
+  }
+  console.log({dataMap});
+  fetchMapAction(dataMap)
+}
 
 export const fetchEntity = entity => {
   return store.dispatch ({
       type: ACTIONS.Analytics.fetchEntity.toString (),
-      payload: new Promise (entity),
+      payload: entity,
     }).then (() => dispatch (bar ()));
   };
 
 export const track = action => {
   return store.dispatch({
       type: ACTIONS.Analytics.track.toString (),
+      meta: {
+        analytics: {
+          type: 'my-analytics-event',
+          payload: action.payload
+        }
+      },
       payload: new Promise (),
     }).then (() => dispatch (bar ()));
 };

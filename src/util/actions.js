@@ -25,14 +25,23 @@ export default Object.freeze({
 
     // Yes, Analytics has ACTIONSs too. This way we get to track the state of analytics configurations and events in redux.
     Analytics: {
+        
         configure: enumValue('ACTIONS.Analytics.configure'),
+        
         addEventListener: enumValue('ACTIONS.Analytics.addEventListener'),
         domEvents: enumValue('ACTIONS.Analytics.domEvents'),
-        fetchMap: enumValue('ACTIONS.Analytics.fetchMap'), 
+        
         fetchEntity: enumValue('ACTIONS.Analytics.fetchEntity'), 
         // requestProduct: enumValue('ACTIONS.Analytics.requestProduct'), 
         page: enumValue('ACTIONS.Analytics.page'),
-        track: enumValue('ACTIONS.Analytics.track')
+        
+
+        event: {
+            add: enumValue('ACTIONS.Analytics.event.add'),
+            update: enumValue('ACTIONS.Analytics.event.update'),
+            fetchMap: enumValue('ACTIONS.Analytics.event.fetchMap'), 
+            track: enumValue('ACTIONS.Analytics.event.track'),
+        },
     }
   });
 ``

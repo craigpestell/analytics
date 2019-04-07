@@ -1,33 +1,74 @@
-import enumValue from './enumValue';
+import AnalyticsService from '../AnalyticsService';
+
+const product = AnalyticsService.product;
+
+class AnalyticsEvent {
+  constructor(name, data = {}, dataMap = {}) {
+    this.name = name;
+    this.data = {
+      event_name: name
+    }
+    this._dataMap = dataMap;
+    
+  }
+  set dataMap(dataMap) {
+    console.log({dataMap})
+    Object.keys(dataMap).reduce((prev, curr, i, arr) => {
+      console.log('set dataMap args', {...arguments})
+    })
+    this._dataMap = Object.assign(this._dataMap, dataMap);
+  }
+  get dataMap() {
+    return this._dataMap;
+  }
+
+  get data() {
+    return this.data;
+  }
+  toString(){
+    return this.name;
+  }
+}
+
+const QuickView = new AnalyticsEvent('quick-view');
+QuickView.dataMap = {
+  product
+}
+class QVEvent extends AnalyticsEvent{
+  constructor(name){
+    super(`EVENT.QuickView.${name}`, {['default']: 'some data'}, {product})
+  }
+}
 
 export default Object.freeze({
     //DOM events
     DOM: {
       Element: {
-        viewed: enumValue('EVENT.Element.viewed'),
-        clicked: enumValue('EVENT.Element.clicked'),
-        mousedOver: enumValue('EVENT.Element.mousedOver'),
-        redirected: enumValue('EVENT.Element.redirected'),
+        viewed: new AnalyticsEvent('EVENT.Element.viewed'),
+        clicked: new AnalyticsEvent('EVENT.Element.clicked'),
+        mousedOver: new AnalyticsEvent('EVENT.Element.mousedOver'),
+        redirected: new AnalyticsEvent('EVENT.Element.redirected'),
       }
     },
 
     // Generic Marionette events for features.
     Marionette: {
-      rendered: enumValue('EVENT.Marionette.rendered')
+      initialized: new AnalyticsEvent('EVENT.Marionette.initialized'),
+      rendered: new AnalyticsEvent('EVENT.Marionette.rendered')
     },
 
     // E-commerce events
     Product: {
-      viewed: enumValue('EVENT.Product.viewed'),
-      clicked: enumValue('EVENT.Product.clicked'),
-      fetchSuccess: enumValue('EVENT.Product.fetchSuccess'),
-      fetchFailed: enumValue('EVENT.Product.fetchFailed')
+      viewed: new AnalyticsEvent('EVENT.Product.viewed'),
+      clicked: new AnalyticsEvent('EVENT.Product.clicked'),
+      fetchSuccess: new AnalyticsEvent('EVENT.Product.fetchSuccess'),
+      fetchFailed: new AnalyticsEvent('EVENT.Product.fetchFailed')
 
     },
     QuickView: {
-      viewed: enumValue('EVENT.QuickView.viewed'),
-      clicked: enumValue('EVENT.QuickView.clicked'),
-      fetchSuccess: enumValue('EVENT.QuickView.fetchSuccess'),
-      fetchFailed: enumValue('EVENT.QuickView.fetchFailed'),
+      viewed: new QVEvent('viewed'),
+      clicked: new QVEvent('EVENT.QuickView.clicked'),
+      fetchSuccess: new AnalyticsEvent('EVENT.QuickView.fetchSuccess'),
+      fetchFailed: new AnalyticsEvent('EVENT.QuickView.fetchFailed'),
     }
   });

@@ -26,8 +26,8 @@ const product = _.memoize((pId) => {
     });
 });
 
+const mcomQuickView = (response) => quickView('mcom', response);
 const quickView = (response, brand) => {
-  const ObjectUtil = require('@component/common/src/util/ObjectUtil');
   if (response) {
     const data = ObjectUtil.hasChildProperty(response, 'product.meta.analytics.data') ? response.product.meta.analytics.data : {};
     const detail = ObjectUtil.hasChildProperty(response, 'product.detail') ? response.product.detail : {};
@@ -92,7 +92,7 @@ export default {
     page: () => (page()),
     experiment:() => (experiment()),
     product:(id) => (product(id)),
-    quickView:(response, brand) => {
+    mcomQuickView:(response, brand) => {
       return _.memoize((response) => {
         return new Promise((resolve) => {
           resolve(quickView(response, brand));

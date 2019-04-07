@@ -10,7 +10,8 @@
 // https://github.com/jhen0409/react-native-debugger
 //
 import { compose } from 'redux'
-const devtools = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const devtools =window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ &&
+window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ trace: true, traceLimit: 25 }) || compose;
 export default {
   composers: [devtools]
 }

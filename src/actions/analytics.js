@@ -8,17 +8,8 @@ import store from '../analytics';
 import { ACTIONS } from '../util';
 import { AnalyticsController } from '../analytics';
 import CssSelectorGenerator from 'css-selector-generator';
-
-export const foo = createAction ('FOO', num => num);
-/* export const addEventListener = createAction (
-  ACTIONS.Analytics.addEventListener.toString (),
-  ({el, data, events}) => {
-    console.log ({el, data, events});
-    return true;
-  }
-);*/
-
-export const domEvents = domEventsConfig => {
+import promise from 'redux-promise-middleware';
+export const trackDomEvents = domEventsConfig => {
   const selectorGen = new CssSelectorGenerator();
   let domEventActions = [];
   domEventsConfig.forEach (elConfig => {
@@ -55,8 +46,9 @@ export const domEvents = domEventsConfig => {
       payload: Promise.all (domEventActions.map((action) => (store.dispatch(action)))),
     })
     .then (({value, action}) => {
+      
       //actually add the event listeners to the DOM.
-      value.forEach(({payload}) => {
+      value.forEach((payload) => {
         const {data, el, event} = payload;
         AnalyticsController.addEventListener(el, event, data);
       })
@@ -68,20 +60,11 @@ const bar = () => ({
   payload: {'bar': 'foo'}
 })
 
-export const fetchMap = dataMap => {
-  function fetchMapAction(dataMap) {
-    return store.dispatch({
-      type: ACTIONS.Analytics.fetchMap.toString (),
-      payload: Promise.all (
-        dataMap.map (([value, key]) => {
-          console.log ('track promise.all value,key:', value, key);
-        })
-      ),
-    }).then (() => dispatch (bar ()));
-  }
-  console.log({dataMap});
-  fetchMapAction(dataMap)
-}
+export const fetchMap = (eventName) => ({
+    type: ACTIONS.Analytics.event.fetchMap.toString (),
+    payload: new Promise((resolve) => {
+      resolve({type: eventName})}),
+  });
 
 export const fetchEntity = entity => {
   return store.dispatch ({
@@ -92,7 +75,7 @@ export const fetchEntity = entity => {
 
 export const track = action => {
   return store.dispatch({
-      type: ACTIONS.Analytics.track.toString (),
+      type: ACTIONS.Analytics.event.track.toString (),
       meta: {
         analytics: {
           type: 'my-analytics-event',

@@ -208,13 +208,14 @@ The data returned by each would be as follows:
 
 ```
 
-The data can be transformed before being sent to each Analytics library (Tealium/Adobe or Google Analytics) using Reducers.
+The data can be transformed before being sent to each Analytics library (Tealium/Adobe or Google Analytics) using Reducers / Selectors.
 
 ### 1.4.3. Track other events, i.e. onSuccess / onFailure of an ajax call
 
 In the onSuccess or onFailure callback handler register the event tracking:
 
 ```javascript
+
 Analytics.track('my-event-on-success-name', someDataObject);
 ```
 

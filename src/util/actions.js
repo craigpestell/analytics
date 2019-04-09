@@ -40,6 +40,7 @@ export default Object.freeze({
             add: enumValue('ACTIONS.Analytics.event.add'),
             update: enumValue('ACTIONS.Analytics.event.update'),
             fetchMap: enumValue('ACTIONS.Analytics.event.fetchMap'), 
+            fetchEntity: enumValue('ACTIONS.Analytics.event.fetchMap'),
             track: enumValue('ACTIONS.Analytics.event.track'),
         },
     }

@@ -7,23 +7,16 @@
 // https://github.com/gaearon/redux-thunk
 // https://github.com/pburtchaell/redux-promise-middleware
 //
-import { applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
+import {applyMiddleware} from 'redux';
 import promiseMiddleware from 'redux-promise-middleware';
-import analyticsMiddleware from './analyticsMiddleware';
-import tagManagerUtilMiddleware from './tagManagerUtilMiddleware';
-
-console.log( {tagManagerUtilMiddleware,promiseMiddleware,analyticsMiddleware});
+import tagManagerMiddleware from './tagManagerMiddleware';
 
 const middleware = [
-  analyticsMiddleware,
-  tagManagerUtilMiddleware,
-  thunk,
+  tagManagerMiddleware,
   promiseMiddleware,
-  
-]
+];
 
 export default {
   name: 'middleware',
-  enhancers: [applyMiddleware(...middleware)],
-}
+  enhancers: [applyMiddleware (...middleware)],
+};

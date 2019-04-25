@@ -1,9 +1,9 @@
-import AnalyticsEvent from './AnalyticsEvent'
-import QuickViewEvent from './QuickView'
+import Mn from 'backbone.marionette';
+import AnalyticsEvent from './AnalyticsEvent';
+import QuickViewEvent from './QuickView';
 import ProductThumbnailEvent from './ProductThumbnail';
 import EVENT_TYPE from '../util/constants';
 import DiscoveryPagesEvent from './DiscoveryPages';
-
 
 
 export const ANALYTICS_EVENT = {
@@ -48,7 +48,10 @@ export const ANALYTICS_EVENT = {
     fetchDataMap: new AnalyticsEvent ('EVENT.Analytics.dataMapFetched'),
   },
 };
+
 export default ANALYTICS_EVENT;
+
+export const ANALYTICS_VENT = new Mn.EventAggregator(ANALYTICS_EVENT);
 
 // create hashmap lookup
 let hashMap = {};
@@ -56,6 +59,8 @@ Object.entries(ANALYTICS_EVENT).forEach(([componentType, componentEvents]) => {
   Object.entries(componentEvents).forEach(([eventType, eventObj]) => {
     const hash = `EVENT.${componentType}.${eventType}`;
     hashMap[hash] = eventObj;
+
+    
   })
 });
 

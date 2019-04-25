@@ -9,6 +9,9 @@ import gql from 'graphql-tag';
 import EventEmitter from 'events';
 
 import ANALYTICS_EVENTS from './events';
+import ANALYTICS_VENT from './events';
+export {ANALYTICS_VENT};
+
 import TagManagerPlugin from './plugins/tag-manager'
 
 const cache = new InMemoryCache();
@@ -95,7 +98,23 @@ export default class AnalyticsController extends EventEmitter {
         return ANALYTICS_EVENTS;
     }
 
+    /**
+     * 
+     * @param {AnalyticsEvent} event 
+     */
+    track(event){
+        window.analytics.track(event.type, event.data);
+    }
 
+    /**
+     * 
+     * @param {*} eventType 
+     * @param {*} event 
+     */  
+    on(eventType, event, target){
+
+        console.log({['this']: this});
+    }
 
     doSomething() {
         // example of emitting an event that consumers can attach listeners to

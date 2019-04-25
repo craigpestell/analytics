@@ -1,15 +1,15 @@
 import Analytics from 'analytics';
 import ApolloClient from 'apollo-boost';
 import { HttpLink } from 'apollo-link-http';
-
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import graphql from 'graphql.js';
+import Backbone from 'backbone';
 import gql from 'graphql-tag';
 
 import EventEmitter from 'events';
 
-import ANALYTICS_EVENTS from './events';
+export { default as ANALYTICS_EVENT } from './events';
 import ANALYTICS_VENT from './events';
+export {default as AnalyticsBehavior} from './AnalyticsBehavior';
 export {ANALYTICS_VENT};
 
 import TagManagerPlugin from './plugins/tag-manager'
@@ -21,80 +21,70 @@ const client = new ApolloClient({
     cache,
     dataIdFromObject: object => object.name,
     addTypename: true,
+    connectToDevTools: true
 });
-
-client.writeFragment({
-    id: '5',
-    fragment: gql`
-        fragment writeMyTodo on Todo {
-        completed
-        }
-    `,
-    data: {
-        completed: true,
-        __typename: 'todo'
-    },
-});
-// const mutationData = client.readQuery({query});
-
-const todo = client.readFragment({
-    id: '5',
-    fragment: gql`
-        fragment readMyTodo on Todo {
-        id
-        text
-        completed
-        }
-    `,
-});
-console.log({todo});
-
-const addEvent = (event) => {
-    client.writeFragment({
-        id: event.name,
-        fragment: gql`
-        fragment writeEvent on Event {
-            event
-        }
-        `,
-        data: {
-            __typename: 'event',
-            event: event
-        }
-    })
-}
-const getEvent= (name)=> {
-    return client.readFragment({
-        id: name,
-        fragment: gql`
-        fragment getEvent on Event{
-            event
-        }`
-    })
-}
 
 export default class AnalyticsController extends EventEmitter {
-    constructor(options) {
+    constructor(options = {}) {
         super(); // calls EventEmitter's constructor
-        if (!window.analytics) {
+        // Module to allow 'pluggable' destinations. 
+        // Change, add, or remove analytics vendors here (Adobe/Tealium/Google)
+        this._analytics = Analytics({
+            app: 'my-app-name',
+            version: 100,
+            plugins: [
+                TagManagerPlugin({
+                    env: 'dev',
+                    brand: options.brand || 'mcom'
+                })
+            ]
+        });
+        // window.analytics = analytics;
+        window.addEventListener('track', (d) => {
+            console.log('addeventlistener track', d);
+        })
 
-            // Module to allow 'pluggable' destinations. 
-            // Change, add, or remove analytics vendors here (Adobe/Tealium/Google)
-            this._analytics = Analytics({
-                app: 'my-app-name',
-                version: 100,
-                plugins: [
-                    TagManagerPlugin({
-                        env: 'dev',
-                        brand: options.brand || 'mcom'
-                    })
-                ]
-            });
-            window.analytics = analytics;
-        }
+    }
+    static addEvent(event, triggerName){
+        client.writeFragment({
+            id: event.name,
+            fragment: gql`
+            fragment writeEvent on Event {
+                event
+            }
+            `,
+            data: {
+                __typename: 'event',
+                event: event
+            }
+        })
+    }
+    static getEvent (name) {
+        return client.readFragment({
+            id: name,
+            fragment: gql`
+            fragment getEvent on Event{
+                event
+            }`
+        })
     }
 
-    get event() {
+    static logEvent(event) {
+        client.writeFragment({
+            id: event.name,
+            fragment: gql`
+            fragment writeLog on Event {
+                log
+            }
+            `,
+            data: {
+                __typename: 'event',
+                log: event.data
+            }
+        })
+    }
+
+    get events() {
         return ANALYTICS_EVENTS;
     }
 
@@ -102,8 +92,8 @@ export default class AnalyticsController extends EventEmitter {
      * 
      * @param {AnalyticsEvent} event 
      */
-    track(event){
-        window.analytics.track(event.type, event.data);
+    track(type, data){
+        this._analytics.track(type, data);
     }
 
     /**
@@ -122,7 +112,6 @@ export default class AnalyticsController extends EventEmitter {
     }
 }
 
-addEvent(ANALYTICS_EVENTS.ProductThumbnail.viewed);
-
-const retrieved = getEvent(ANALYTICS_EVENTS.ProductThumbnail.viewed.name);
-console.log({retrieved});
+if(!window.analyticsController){
+    window.analyticsController = new AnalyticsController();
+}

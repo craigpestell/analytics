@@ -15,7 +15,8 @@ export default function TagManagerPlugin(userConfig) {
     NAMESPACE: 'tag-manager',
     config: Object.assign({}, config, userConfig),
     initialize: ({ config }) => {
-      const {brand, env} = config
+      const {brand, env} = config;
+      const brandParam = brand == 'bcom' ? 'bloomingdales' : 'macys';
       const { siteID } = config
       if (!brand) {
         throw new Error('No TagManager brand defined')
@@ -26,8 +27,9 @@ export default function TagManagerPlugin(userConfig) {
       if (inBrowser && typeof utag === 'undefined') {
         window.utag_cfg_ovrd = {noview : true};
         //Loading script asynchronously
+        // https://tags.tiqcdn.com/utag/macys/main/prod/utag.js
         (function(a,b,c,d){
-                a='//tags.tiqcdn.com/utag/{{properties.brand}}/main/{{properties.tagEnv}}/utag.js';
+                a=`https://tags.tiqcdn.com/utag/${brandParam}/main/${env}/utag.js`;
                 b=document;c='script';d=b.createElement(c);d.src=a;d.type='text/java'+c;d.async=true;
                 a=b.getElementsByTagName(c)[0];a.parentNode.insertBefore(d,a);
         })();

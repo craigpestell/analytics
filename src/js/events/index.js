@@ -1,10 +1,8 @@
-import Mn from 'backbone.marionette';
 import AnalyticsEvent from './AnalyticsEvent';
 import QuickViewEvent from './QuickView';
 import ProductThumbnailEvent from './ProductThumbnail';
-import EVENT_TYPE from '../util/constants';
+import {EVENT_TYPE} from '../util/constants';
 import DiscoveryPagesEvent from './DiscoveryPages';
-
 
 export const ANALYTICS_EVENT = {
   //DOM events
@@ -51,7 +49,6 @@ export const ANALYTICS_EVENT = {
 
 export default ANALYTICS_EVENT;
 
-export const ANALYTICS_VENT = new Mn.EventAggregator(ANALYTICS_EVENT);
 
 // create hashmap lookup
 let hashMap = {};

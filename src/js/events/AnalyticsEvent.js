@@ -1,60 +1,95 @@
-import {EVENT_TYPE} from '../util/constants';
-import AnalyticsController from '../analytics';
+import backbone from 'backbone';
+import { EVENT_TYPE } from '../util/constants';
+import {default as AnalyticsController} from '../analytics';
+console.log({AnalyticsController});
 
 export default class AnalyticsEvent {
-  constructor (
+  constructor(
     name,
-    eventType = EVENT_TYPE.link.toString (),
-    options = {data: {}, dataMap: {}, asyncEvent: false}
+    eventType = EVENT_TYPE.link.toString(),
+    options = { data: {}, dataMap: {}, asyncEvent: false }
   ) {
+    //this._channel = backbone.Radio.channel('analytics');
+    // this._channel.on('track', this.listener);
+
     this._name = name;
     this._type = eventType;
-    this._data = Object.assign (options.data || {}, {event_name: name});
-    this._dataMap = options.dataMap || {};
+    this._data = Object.assign(options.data || {}, { event_name: name });
+    this._dataMap = options.dataMap;
     this._async = options.asyncEvent || false;
+
+    this.track = this.track.bind(this);
   }
+
+  track(context) {
+    const event = this;
+    // check if the event is already added/registered.
+    const existing = AnalyticsController.getEvent(event.name);
+    console.log({existing});
+    if(!existing){
+      AnalyticsController.addEvent(event);
+    }
+    this.fetchMap().then((data) => {
+      const trackResult = window.analyticsController.track(event.type, data)
+      AnalyticsController.logEvent(event);
+      return trackResult;
+    })
+  }
+
 
   listener(e) {
-    if(this._type == EVENT_TYPE.view){
+    console.log('listener:', { e })
+    if (this._type == EVENT_TYPE.view) {
 
     }
-    
+
   }
 
-  set dataMap (dataMap) {
-    console.log ({dataMap});
-    Object.keys (dataMap).reduce ((prev, curr, i, arr) => {
-      console.log ('set dataMap args', {...arguments});
+  set dataMap(dataMap) {
+
+    Object.keys(dataMap).reduce((prev, curr, i, arr) => {
+      console.log('set dataMap args', { ...arguments });
     });
-    this._dataMap = Object.assign (this._dataMap, dataMap);
+    this._dataMap = Object.assign(this._dataMap, dataMap || {});
   }
 
-  get dataMap () {
+  fetchMap() {
+    const keys = Object.keys(this.dataMap);
+    if (keys.length > 0) {
+      return Object.entries(this.dataMap).map(Promise.all(([name, fetchPromise]) => {
+        console.log({ name, fetchPromise });
+      }));
+    } else {
+      return new Promise((resolve) => resolve({}));
+    }
+
+  }
+
+  get dataMap() {
     return this._dataMap;
   }
 
-  get data () {
+  get data() {
     return this._data;
   }
 
-  get type () {
+  get type() {
     return this._type;
   }
 
-  get name () {
+  get name() {
     return this._name;
   }
 
-  get async () {
+  get async() {
     return this._async;
   }
 
-  [Symbol.toPrimitive] (hint) {
+  [Symbol.toPrimitive](hint) {
     return this.name;
   }
 
-  toString () {
+  toString() {
     return this._name;
   }
 }
-  

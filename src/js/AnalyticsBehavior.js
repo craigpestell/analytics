@@ -5,7 +5,7 @@ import Analytics from './analytics';
 import { AnalyticsController } from './analytics';
 
 import ANALYTICS_EVENT from './events';
-import ACTIONS from './actions';
+
 import AnalyticsService from './AnalyticsService';
 
 
@@ -66,7 +66,8 @@ const AnalyticsBehavior = Mn.Behavior.extend ({
     this.triggerMethod('trackView');*/
 
     // this.once('analytics:track-view', this.trackView);
-    AnalyticsController.addEvent(ANALYTICS_EVENT.View.viewed);
+    // ANALYTICS_EVENT.View.viewed.subscribe()
+    ANALYTICS_EVENT.View.viewed.track(this);
   },
 
   trackView(){
@@ -103,11 +104,7 @@ const AnalyticsBehavior = Mn.Behavior.extend ({
 
   onClickCta (evt) {
     // Primary call-to-action link click.
-    Analytics.dispatch (ACTIONS.Analytics.event.track(),
-      {
-        event: ANALYTICS_EVENT.Element.clicked.toString(), 
-        data: {event_name: 'call to action'}
-      });
+    ANALYTICS_EVENT.Element.clicked.track(evt);
   },
 
   onClickCtaSecondary (evt) {

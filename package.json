@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": "git@code.devops.fds.com:polaris/component/analytics.git"
+    "url": "git@github.com:craigpestell/analytics.git"
   },
   "config": {
     "environment": [
@@ -36,7 +36,7 @@
     "node": "8.x",
     "npm": "5.x"
   },
-  "main": "src/refactored-analytics.js",
+  "main": "src/analytics.js",
   "devDependencies": {
     "@core/dev-server": "^1.0.0",
     "@core/lib": "^1.0.0",

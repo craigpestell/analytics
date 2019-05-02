@@ -1,7 +1,5 @@
-import backbone from 'backbone';
 import { EVENT_TYPE } from '../util/constants';
 import {default as AnalyticsController} from '../analytics';
-console.log({AnalyticsController});
 
 export default class AnalyticsEvent {
   constructor(
@@ -15,7 +13,7 @@ export default class AnalyticsEvent {
     this._name = name;
     this._type = eventType;
     this._data = Object.assign(options.data || {}, { event_name: name });
-    this._dataMap = options.dataMap;
+    this._dataMap = options.dataMap || {};
     this._async = options.asyncEvent || false;
 
     this.track = this.track.bind(this);
@@ -29,7 +27,7 @@ export default class AnalyticsEvent {
     if(!existing){
       AnalyticsController.addEvent(event);
     }
-    this.fetchMap().then((data) => {
+    this.fetchMap(context).then((data) => {
       const trackResult = window.analyticsController.track(event.type, data)
       AnalyticsController.logEvent(event);
       return trackResult;
@@ -53,16 +51,17 @@ export default class AnalyticsEvent {
     this._dataMap = Object.assign(this._dataMap, dataMap || {});
   }
 
-  fetchMap() {
+  fetchMap(context) {
     const keys = Object.keys(this.dataMap);
+    const entityPromises = Object.entries(this.dataMap).map(([name, listener]) =>(listener(context)))
+    console.log({entityPromises});
     if (keys.length > 0) {
-      return Object.entries(this.dataMap).map(Promise.all(([name, fetchPromise]) => {
-        console.log({ name, fetchPromise });
-      }));
+      return Promise.all((entityPromises) => {
+        console.log({ name, entityPromises });
+      });
     } else {
       return new Promise((resolve) => resolve({}));
     }
-
   }
 
   get dataMap() {

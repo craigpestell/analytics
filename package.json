@@ -41,25 +41,34 @@
     "@core/dev-server": "^1.0.0",
     "@core/lib": "^1.0.0",
     "@core/server": "^1.0.0",
-    "@types/node": "^11.13.7",
+    "@graphql-codegen/cli": "^1.1.1",
+    "@graphql-codegen/typescript": "1.1.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "1.1.1",
+    "@graphql-codegen/typescript-operations": "1.1.1",
+    "apollo-server": "^2.4.8",
+    "concurrently": "^4.1.0",
+    "cpx": "^1.5.0",
+    "graphql": "^14.2.1",
     "lodash": "^4.17.4",
+    "nodemon": "^1.18.8",
     "typescript": "^3.4.5"
   },
   "dependencies": {
     "@component/common": "^1.0.0",
-    "@types/aws-lambda": "^8.10.24",
-    "@types/ws": "^6.0.1",
+    "@types/source-map": "^0.5.2",
     "analytics": "0.0.21",
     "apollo-boost": "^0.3.1",
     "apollo-cache-inmemory": "^1.5.1",
     "apollo-client": "^2.5.1",
     "apollo-link-http": "^1.5.14",
-    "graphql": "^14.2.1",
     "graphql-binding": "^2.5.1",
     "graphql-tag": "^2.10.1",
-    "graphql-yoga": "^1.17.4",
-    "graphql.js": "^0.6.1",
-    "reflect-metadata": "^0.1.13",
-    "type-graphql": "^0.17.0"
+    "graphql-tools": "^4.0.4",
+    "reflect-metadata": "^0.1.13"
+  },
+  "scripts": {
+    "dev": "concurrently \"tsc -w\" \"npm run watchgraphql\"",
+    "debug": "concurrently \"tsc \" \"npm run watchgraphql\" \"nodemon --inspect src/js/generated/index.js\"",
+    "watchgraphql": "cpx 'src/schema.graphql' src/js/generated/ -w -v"
   }
 }

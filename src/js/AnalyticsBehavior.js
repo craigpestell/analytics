@@ -35,10 +35,12 @@ const AnalyticsBehavior = Mn.Behavior.extend ({
     callToAction: '.cta-primary',
     callToActionSecondary: '.cta-secondary',
     trackEventWithProduct: '.product-fetch',
+    trackProductThumbnail: '.track-product-thumbnail',
     track: '.track',
   },
 
   events: {
+    'click @ui.trackProductThumbnail': 'onClickProductThumbnail',
     'click @ui.test': 'test',
     'click @ui.callToAction': 'onClickCta',
     'click @ui.callToActionSecondary': 'onClickCtaSecondary',
@@ -116,8 +118,7 @@ const AnalyticsBehavior = Mn.Behavior.extend ({
   },
 
   onClickProductThumbnail(evt) {
-    // Analytics.dispatch(ACTIONS.Analytics.event.track, evt);
-    AnalyticsController.track(ANALYTICS_EVENT.ProductThumbnail.clicked, evt)
+    ANALYTICS_EVENT.ProductThumbnail.clicked.track(evt)
   },
 
   onClickTrack (evt) {

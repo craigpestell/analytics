@@ -1,28 +1,33 @@
 import Analytics from 'analytics';
-import ApolloClient from 'apollo-boost';
-import { HttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import {ApolloClient, HttpLink} from 'apollo-boost'
+
 import Backbone from 'backbone';
 import gql from 'graphql-tag';
 
 import EventEmitter from 'events';
 
+import ANALYTICS_EVENT from './events'
 export { default as ANALYTICS_EVENT } from './events';
 import ANALYTICS_VENT from './events';
 export {default as AnalyticsBehavior} from './AnalyticsBehavior';
 export {ANALYTICS_VENT};
 
 import TagManagerPlugin from './plugins/tag-manager'
-
-const cache = new InMemoryCache();
+import { SchemaLink } from 'apollo-link-schema';
+import schema from './schema';
+import OptimizedCache from './OptimizedCache';
+console.log({schema});
+const cache = new OptimizedCache({});
 
 const client = new ApolloClient({
-    link: new HttpLink(),
+    link: new SchemaLink({ schema }),
     cache,
-    dataIdFromObject: object => object.name,
-    addTypename: true,
-    connectToDevTools: true
+    // dataIdFromObject: object => object.name,
+    // addTypename: true,
+    connectToDevTools: true,
+    
 });
+
 
 export default class AnalyticsController extends EventEmitter {
     constructor(options = {}) {
@@ -46,42 +51,74 @@ export default class AnalyticsController extends EventEmitter {
 
     }
     static addEvent(event, triggerName){
-        client.writeFragment({
-            id: event.name,
-            fragment: gql`
-            fragment writeEvent on Event {
-                event
+        const CREATE_EVENT = gql`
+            mutation addEvent($name: String!, $type: String!) {
+                addEvent(name: $name, type: $type) {
+                    name
+                    type
+                }
             }
-            `,
+        `;
+
+        client.writeQuery({
+            query: gql`
+            query addEvent{
+                Event{
+                    id
+                    type
+                }
+            }`,
+
             data: {
-                __typename: 'event',
-                event: event
+                Event: {
+                    __typename: "Event",
+                    id: event.name,
+                    type: event.type
+                }
             }
+        })/*.then((event) => {
+            console.log('event added', {event})
         })
+        
+        */
     }
     static getEvent (name) {
-        return client.readFragment({
+        return client.readQuery({
             id: name,
-            fragment: gql`
-            fragment getEvent on Event{
-                event
-            }`
+            query: gql`
+                query events {
+                    Event {
+                        id
+                        type
+                    }
+                }
+            `
         })
     }
 
     static logEvent(event) {
-        client.writeFragment({
-            id: event.name,
-            fragment: gql`
-            fragment writeLog on Event {
+        client.writeQuery({
+            query: gql`
+            query writeLog {
+                Event{
+                    id
+                    type
+                }
                 log
-            }
-            `,
+            }`,
             data: {
-                __typename: 'event',
+                __typename: 'log',
+                Event: {
+                    __typename: 'Event',
+                    id: event.name,
+                    type: event.type
+                },
                 log: event.data
             }
+
         })
+       
+        
     }
 
     get events() {
@@ -114,4 +151,6 @@ export default class AnalyticsController extends EventEmitter {
 
 if(!window.analyticsController){
     window.analyticsController = new AnalyticsController();
+    // initialize a test event
+    AnalyticsController.addEvent(ANALYTICS_EVENT.View.viewed);
 }

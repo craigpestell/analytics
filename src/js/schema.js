@@ -31,7 +31,6 @@ const typeDefs = `
       name: String!
   }
 
-
   type Post {
     id: Int!
     title: String
@@ -48,6 +47,13 @@ const typeDefs = `
 
   # this schema allows the following mutation:
   type Mutation {
+    
+    updateProduct(
+      ProductName(
+        name: String!
+      )
+    ): Product
+
     addEvent (
         name: String!
         type: String!

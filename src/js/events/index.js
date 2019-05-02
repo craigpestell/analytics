@@ -30,8 +30,8 @@ export const ANALYTICS_EVENT = {
 
   // E-commerce events
   ProductThumbnail: {
-    viewed: new ProductThumbnailEvent ('viewed', EVENT_TYPE.view),// new AnalyticsEvent ('EVENT.ProductThumbnail.viewed'),
-    clicked: new ProductThumbnailEvent ('clicked'),// new AnalyticsEvent ('EVENT.ProductThumbnail.viewed'),
+    viewed: new ProductThumbnailEvent ('viewed', EVENT_TYPE.view),
+    clicked: new ProductThumbnailEvent ('clicked'),
     fetchSuccess: new AnalyticsEvent ('EVENT.ProductThumbnail.fetchSuccess'),
     fetchFailed: new AnalyticsEvent ('EVENT.ProductThumbnail.fetchFailed'),
   },

@@ -53,12 +53,9 @@ export default class AnalyticsEvent {
 
   fetchMap(context) {
     const keys = Object.keys(this.dataMap);
-    const entityPromises = Object.entries(this.dataMap).map(([name, listener]) =>(listener(context)))
-    console.log({entityPromises});
+    
     if (keys.length > 0) {
-      return Promise.all((entityPromises) => {
-        console.log({ name, entityPromises });
-      });
+      return Promise.all((Object.entries(this.dataMap).map(([name, listener]) => (listener(context)))))
     } else {
       return new Promise((resolve) => resolve({}));
     }

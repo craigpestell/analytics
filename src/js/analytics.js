@@ -10,6 +10,7 @@ import ANALYTICS_EVENT from './events'
 export { default as ANALYTICS_EVENT } from './events';
 import ANALYTICS_VENT from './events';
 export {default as AnalyticsBehavior} from './AnalyticsBehavior';
+export {default as AnalyticsService} from './AnalyticsService';
 export {ANALYTICS_VENT};
 
 import TagManagerPlugin from './plugins/tag-manager'

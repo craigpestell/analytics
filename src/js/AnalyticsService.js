@@ -20,7 +20,7 @@ const experiment = _.memoize(() => {
 
 const product = _.memoize((pId) => {
   console.log('fetching productId: ', pId);
-    return fetch(`/xapi/digital/v1/product/${pId}?size=small&clientId=PROS&_shoppingMode=SITE&_customerExperiment=NO_EXPERIMENT&_customerState=GUEST&currencyCode=USD&_regionCode=US`)
+    return fetch(`https://www.macys.com/xapi/digital/v1/product/${pId}?size=small&clientId=PROS&_shoppingMode=SITE&_customerExperiment=NO_EXPERIMENT&_customerState=GUEST&currencyCode=USD&_regionCode=US`)
     .then((res) => {
       return res.json();
     });

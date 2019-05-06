@@ -1,6 +1,49 @@
 import { EVENT_TYPE } from '../util/constants';
 import {default as AnalyticsController} from '../analytics';
 
+
+
+let eventMixin = {
+  /**
+   * Subscribe to event, usage:
+   *  menu.on('select', function(item) { ... }
+  */
+  on(eventName, handler) {
+    if (!this._eventHandlers) this._eventHandlers = {};
+    if (!this._eventHandlers[eventName]) {
+      this._eventHandlers[eventName] = [];
+    }
+    this._eventHandlers[eventName].push(handler);
+  },
+
+  /**
+   * Cancel the subscription, usage:
+   *  menu.off('select', handler)
+   */
+  off(eventName, handler) {
+    let handlers = this._eventHandlers && this._eventHandlers[eventName];
+    if (!handlers) return;
+    for (let i = 0; i < handlers.length; i++) {
+      if (handlers[i] === handler) {
+        handlers.splice(i--, 1);
+      }
+    }
+  },
+
+  /**
+   * Generate the event and attach the data to it
+   *  this.trigger('select', data1, data2);
+   */
+  trigger(eventName, ...args) {
+    if (!this._eventHandlers || !this._eventHandlers[eventName]) {
+      return; // no handlers for that event name
+    }
+
+    // call the handlers
+    this._eventHandlers[eventName].forEach(handler => handler.apply(this, args));
+  }
+};
+
 export default class AnalyticsEvent {
   constructor(
     name,
@@ -15,51 +58,74 @@ export default class AnalyticsEvent {
     this._data = Object.assign(options.data || {}, { event_name: name });
     this._dataMap = options.dataMap || {};
     this._async = options.asyncEvent || false;
-
     this.track = this.track.bind(this);
+    this.on(this.name, this.listener);
   }
-
-  track(context) {
-    const event = this;
-    // check if the event is already added/registered.
-    const existing = AnalyticsController.getEvent(event.name);
-    console.log({existing});
-    if(!existing){
-      AnalyticsController.addEvent(event);
-    }
-    this.fetchMap(context).then((data) => {
-      const trackResult = window.analyticsController.track(event.type, data)
-      AnalyticsController.logEvent(event);
-      return trackResult;
-    })
-  }
-
 
   listener(e) {
+    const event = this;
     console.log('listener:', { e })
-    if (this._type == EVENT_TYPE.view) {
+    if (event._type == EVENT_TYPE.view) {
 
     }
 
   }
 
   set dataMap(dataMap) {
-
     Object.keys(dataMap).reduce((prev, curr, i, arr) => {
       console.log('set dataMap args', { ...arguments });
     });
     this._dataMap = Object.assign(this._dataMap, dataMap || {});
   }
 
-  fetchMap(context) {
+  async fetchMap(context) {
     const keys = Object.keys(this.dataMap);
     
     if (keys.length > 0) {
-      return Promise.all((Object.entries(this.dataMap).map(([name, listener]) => (listener(context)))))
+      const entries = Object.entries(this.dataMap);
+      const promiseArr = entries.map(([name, listener]) => {
+        console.log({name, listener})
+        const listenerResult = listener(context);
+        console.log({listenerResult});
+        return listenerResult;
+      })
+      console.log({promiseArr});
+      const promiseAll = await Promise.all(promiseArr)
+      .then((data) => {
+        console.log({data})
+        return data;
+      });
+      console.log({promiseAll});
+      return promiseAll;
+      
+      /* return Promise.all((Object.entries(this.dataMap).map(([name, listener]) => {
+        console.log({name, listener})
+        return listener(context)
+      })))*/
     } else {
       return new Promise((resolve) => resolve({}));
     }
   }
+
+  track(context) {
+    const event = this;
+    // check if the event is already added/registered.
+    const existing = AnalyticsController.getEvent(event.name);
+    if(!existing){
+      AnalyticsController.addEvent(event);
+    }
+    
+    return new Promise((resolve) => {
+
+      this.fetchMap(context).then((mapResults) =>{
+        Object.assign(this.data, mapResults);
+        AnalyticsController.logEvent({event: this});
+        resolve(window._analytics.track(this.type, this.data));
+      })
+    })
+    
+  }
+
 
   get dataMap() {
     return this._dataMap;
@@ -89,3 +155,5 @@ export default class AnalyticsEvent {
     return this._name;
   }
 }
+
+Object.assign(AnalyticsEvent.prototype, eventMixin);

@@ -2,11 +2,19 @@ import Analytics from 'analytics';
 import EventEmitter from 'events';
 
 import ANALYTICS_EVENT from './events'
+import {EVENT_TYPE} from './util/constants'
 export { default as ANALYTICS_EVENT } from './events';
+export * from './events';
+export * from './util/constants';
+import * as mixins from './mixins';
+export { default as AnalyticsMixins } from './mixins';
 export { default as AnalyticsBehavior } from './AnalyticsBehavior';
 export { default as AnalyticsService } from './AnalyticsService';
 
 import TagManagerPlugin from './plugins/tag-manager'
+
+
+console.log({mixins})
 
 // temp store until graphql is worked out.
 let store = {
@@ -37,12 +45,7 @@ export default class AnalyticsController extends EventEmitter {
         }
     }
     static initStore(options) {
-        client.writeData({
-            data: {
-                Event: ANALYTICS_EVENT.Analytics.initialized(options)
-
-            }
-        })
+        AnalyticsController.addEvent(ANALYTICS_EVENT.Analytics.initialized(options));
     }
     static addEvent(event, triggerName) {
         store.events[event.name] = event;
@@ -62,6 +65,11 @@ export default class AnalyticsController extends EventEmitter {
 
     get events() {
         return ANALYTICS_EVENTS;
+    }
+
+    static addEventListener(event){
+        // attach dom event listeners.
+        
     }
 
     /**

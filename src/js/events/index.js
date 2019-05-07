@@ -1,4 +1,5 @@
 import AnalyticsEvent from './AnalyticsEvent';
+import BannerEvent from './Banner';
 import QuickViewEvent from './QuickView';
 import ProductThumbnailEvent from './ProductThumbnail';
 import {EVENT_TYPE} from '../util/constants';
@@ -22,6 +23,7 @@ export const ANALYTICS_EVENT = {
     viewed: (pageApp) => (new DiscoveryPagesEvent('viewed', EVENT_TYPE.view, pageApp))
   },
 
+  
   // Generic Marionette events for features.
   View: {
     initialized: () => (new AnalyticsEvent ('EVENT.View.initialized', EVENT_TYPE.view)),
@@ -40,6 +42,9 @@ export const ANALYTICS_EVENT = {
     clicked: () =>( new QuickViewEvent ('clicked')),
     fetchSuccess: () =>(new AnalyticsEvent ('EVENT.QuickView.fetchSuccess')),
     fetchFailed: () =>( new AnalyticsEvent ('EVENT.QuickView.fetchFailed')),
+  },
+  Banner: {
+    viewed: () => ( new BannerEvent('impressed', EVENT_TYPE.impression))
   },
   Analytics: {
     initialized: () => (new AnalyticsEvent('EVENT.Analytics.initialized'), EVENT_TYPE.analytics)
@@ -63,5 +68,6 @@ Object.entries(ANALYTICS_EVENT).forEach(([componentType, componentEvents]) => {
     
   })
 });
+
 
 export { hashMap as eventMap, AnalyticsEvent, QuickViewEvent, ProductThumbnailEvent};

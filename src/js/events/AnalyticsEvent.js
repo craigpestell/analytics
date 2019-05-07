@@ -2,53 +2,11 @@ import { EVENT_TYPE } from '../util/constants';
 import {default as AnalyticsController} from '../analytics';
 
 
-
-let eventMixin = {
-  /**
-   * Subscribe to event, usage:
-   *  menu.on('select', function(item) { ... }
-  */
-  on(eventName, handler) {
-    if (!this._eventHandlers) this._eventHandlers = {};
-    if (!this._eventHandlers[eventName]) {
-      this._eventHandlers[eventName] = [];
-    }
-    this._eventHandlers[eventName].push(handler);
-  },
-
-  /**
-   * Cancel the subscription, usage:
-   *  menu.off('select', handler)
-   */
-  off(eventName, handler) {
-    let handlers = this._eventHandlers && this._eventHandlers[eventName];
-    if (!handlers) return;
-    for (let i = 0; i < handlers.length; i++) {
-      if (handlers[i] === handler) {
-        handlers.splice(i--, 1);
-      }
-    }
-  },
-
-  /**
-   * Generate the event and attach the data to it
-   *  this.trigger('select', data1, data2);
-   */
-  trigger(eventName, ...args) {
-    if (!this._eventHandlers || !this._eventHandlers[eventName]) {
-      return; // no handlers for that event name
-    }
-
-    // call the handlers
-    this._eventHandlers[eventName].forEach(handler => handler.apply(this, args));
-  }
-};
-
 export default class AnalyticsEvent {
   constructor(
     name,
     eventType = EVENT_TYPE.link.toString(),
-    options = { data: {}, dataMap: {}, asyncEvent: false }
+    options = { data: {}, dataMap: {}, asyncEvent: false, selector: null }
   ) {
     //this._channel = backbone.Radio.channel('analytics');
     // this._channel.on('track', this.listener);
@@ -58,8 +16,9 @@ export default class AnalyticsEvent {
     this._data = Object.assign(options.data || {}, { event_name: name });
     this._dataMap = options.dataMap || {};
     this._async = options.asyncEvent || false;
+    this._selector = options.selector || null;
     this.track = this.track.bind(this);
-    this.on(this.name, this.listener);
+
   }
 
   listener(e) {
@@ -97,11 +56,6 @@ export default class AnalyticsEvent {
       });
       console.log({promiseAll});
       return promiseAll;
-      
-      /* return Promise.all((Object.entries(this.dataMap).map(([name, listener]) => {
-        console.log({name, listener})
-        return listener(context)
-      })))*/
     } else {
       return new Promise((resolve) => resolve({}));
     }
@@ -116,16 +70,13 @@ export default class AnalyticsEvent {
     }
     
     return new Promise((resolve) => {
-
       this.fetchMap(context).then((mapResults) =>{
-        Object.assign(this.data, mapResults);
-        AnalyticsController.logEvent({event: this});
-        resolve(window._analytics.track(this.type, this.data));
+        Object.assign(event.data, mapResults);
+        AnalyticsController.logEvent({event});
+        resolve(window._analytics.track(event.type, event.data));
       })
     })
-    
   }
-
 
   get dataMap() {
     return this._dataMap;
@@ -147,6 +98,10 @@ export default class AnalyticsEvent {
     return this._async;
   }
 
+  get selector(){ 
+    return this._selector;
+  }
+
   [Symbol.toPrimitive](hint) {
     return this.name;
   }
@@ -155,5 +110,3 @@ export default class AnalyticsEvent {
     return this._name;
   }
 }
-
-Object.assign(AnalyticsEvent.prototype, eventMixin);

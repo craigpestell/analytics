@@ -1,81 +1,61 @@
 import { EVENT_TYPE } from '../util/constants';
 import {default as AnalyticsController} from '../analytics';
 
-
 export default class AnalyticsEvent {
   constructor(
     name,
     eventType = EVENT_TYPE.link.toString(),
-    options = { data: {}, dataMap: {}, asyncEvent: false, selector: null }
+    options = { data: {}, dataMap: {}, selector: null }
   ) {
-    //this._channel = backbone.Radio.channel('analytics');
-    // this._channel.on('track', this.listener);
-
     this._name = name;
     this._type = eventType;
-    this._data = Object.assign(options.data || {}, { event_name: name });
     this._dataMap = options.dataMap || {};
-    this._async = options.asyncEvent || false;
+    this._data = Object.assign(options.data || {}, { event_name: name });
     this._selector = options.selector || null;
+    this.fetch = this.fetch.bind(this);
     this.track = this.track.bind(this);
-
-  }
-
-  listener(e) {
-    const event = this;
-    console.log('listener:', { e })
-    if (event._type == EVENT_TYPE.view) {
-
-    }
-
-  }
-
-  set dataMap(dataMap) {
-    Object.keys(dataMap).reduce((prev, curr, i, arr) => {
-      console.log('set dataMap args', { ...arguments });
-    });
-    this._dataMap = Object.assign(this._dataMap, dataMap || {});
+    this._listener = undefined;
   }
 
   async fetchMap(context) {
     const keys = Object.keys(this.dataMap);
-    
     if (keys.length > 0) {
       const entries = Object.entries(this.dataMap);
       const promiseArr = entries.map(([name, listener]) => {
-        console.log({name, listener})
-        const listenerResult = listener(context);
-        console.log({listenerResult});
-        return listenerResult;
-      })
-      console.log({promiseArr});
-      const promiseAll = await Promise.all(promiseArr)
-      .then((data) => {
-        console.log({data})
-        return data;
-      });
-      console.log({promiseAll});
-      return promiseAll;
+        if(typeof listener == 'function') {
+          const listenerResult = listener(context);
+          return listenerResult;
+        } else {
+          return listener;
+        }
+      })      
+      return await Promise.all(promiseArr)
     } else {
       return new Promise((resolve) => resolve({}));
     }
   }
 
-  track(context) {
+  fetch(context) {
     const event = this;
-    // check if the event is already added/registered.
-    const existing = AnalyticsController.getEvent(event.name);
-    if(!existing){
-      AnalyticsController.addEvent(event);
-    }
-    
     return new Promise((resolve) => {
       this.fetchMap(context).then((mapResults) =>{
         Object.assign(event.data, mapResults);
-        AnalyticsController.logEvent({event});
-        resolve(window._analytics.track(event.type, event.data));
+        resolve(event.data);
       })
     })
+  }
+  
+  track(context){
+    const event = this;
+    return event.fetch(context)
+      .then((data) => {
+          AnalyticsController.logEvent(event, data)
+          return AnalyticsController.track(event.type, data)
+      });
+  }
+  
+  set dataMap(dataMap) {
+    this._dataMap = Object.assign(this._dataMap, dataMap || {});
   }
 
   get dataMap() {

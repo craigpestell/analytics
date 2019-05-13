@@ -1,84 +1,55 @@
 import listeners from '../listeners';
-import {EVENT_TYPE} from '../util/constants';
+import { EVENT_TYPE } from '../util/constants';
+import AnalyticsController from '../analytics';
+import intersectionObserver from '../listeners';
 
-export default {
-    constructor(){
-        console.log('inside domEventConstructor');
+export default (target) => {
+  /**
+     * calls addEventListener on each DOM element that matches the selector passed as an option to Event constructor
+     */
+  Object.assign(target, {
+
+    getEL() {
+      const applicableElements = (this.selectorIsId) ? [document.getElementById(this.selector)] : document.querySelectorAll(this.selector);
+      return Array.from(applicableElements).filter(el => el != null);
     },
-
 
     addEventListeners() {
-        const event = this;
-        if(event.selector) {
-            const applicableElements = (event.selectorIsId) ? [document.getElementById(event.selector)] : document.querySelectorAll(event.selector);
-            const filteredEls = Array.from(applicableElements).filter(el => el != null);
-            switch(event.type){
-                case EVENT_TYPE.view: 
-                    {
+      const event = this;
 
-                    }
-                    return;
-                case EVENT_TYPE.impression:
-                {
+      if (event.selector) {
+        switch (event.type) {
+          case EVENT_TYPE.impression:
+            {
+              this.getEl().forEach((el) => {
+                event.listener = (e) => {
+                  listeners.impress(event)(e).then((result) => {
+                    event.track(e).then((result) => {
+                      console.log('track result:', { result });
+                    });
+                  });
+                };
 
-                }
-                return;
-                case EVENT_TYPE.link:
-                {
-                    const clickListener = listeners.click(event);
-                    filteredEls.forEach((el) => {
-                        el.addEventListener('click', clickListener);
-                    })
-
-                }
-                return;
-                default:
-                {
-
-                }
-                return;
+                intersectionObserver.observe(el);
+                el.addEventListener('observed', event.listener);
+              });
             }
-        }
-    },
+            return;
+          case EVENT_TYPE.link:
+          {
+            const clickListener = listeners.click(event);
+            filteredEls.forEach((el) => {
+              el.addEventListener('click', event.track);
+            });
+          }
 
-    /**
-     * Subscribe to event, usage:
-     *  menu.on('select', function(item) { ... }
-    */
-    on(eventName, handler) {
-      if (!this._eventHandlers) this._eventHandlers = {};
-      if (!this._eventHandlers[eventName]) {
-        this._eventHandlers[eventName] = [];
-      }
-      this._eventHandlers[eventName].push(handler);
-    },
-  
-    /**
-     * Cancel the subscription, usage:
-     *  menu.off('select', handler)
-     */
-    off(eventName, handler) {
-      let handlers = this._eventHandlers && this._eventHandlers[eventName];
-      if (!handlers) return;
-      for (let i = 0; i < handlers.length; i++) {
-        if (handlers[i] === handler) {
-          handlers.splice(i--, 1);
+          default:
         }
       }
     },
-  
-    /**
-     * Generate the event and attach the data to it
-     *  this.trigger('select', data1, data2);
-     */
-    trigger(eventName, ...args) {
-      if (!this._eventHandlers || !this._eventHandlers[eventName]) {
-        return; // no handlers for that event name
-      }
-  
-      // call the handlers
-      this._eventHandlers[eventName].forEach(handler => handler.apply(this, args));
-    }
-  };
-  
-  
+  });
+
+  // init.
+  target.addEventListeners();
+};
+

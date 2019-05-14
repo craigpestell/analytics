@@ -1,5 +1,5 @@
-
 const observedEvent = new Event('observed');
+
 export const intersectionObserver = new IntersectionObserver(
   (entries, observer) => {
     entries.forEach((entry) => {
@@ -7,14 +7,13 @@ export const intersectionObserver = new IntersectionObserver(
         entry.target.dispatchEvent(observedEvent);
         observer.unobserve(entry.target);
       } else {
-      // If intersectionRatio is 0, the element is out of view
-      // and we do not need to do anything.
-
+        // If intersectionRatio is 0, the element is out of view
+        // and we do not need to do anything.
       }
     });
   },
   {
-  // root: document.querySelector('.sortableGrid'),
+    // root: document.querySelector('.sortableGrid'),
     threshold: [1.0],
     trackVisibility: true,
     delay: 1000,
@@ -23,13 +22,13 @@ export const intersectionObserver = new IntersectionObserver(
 
 export default {
   click: event => (function clickListener(e) {
-    return event.track(e);
+    return event.fetch(e).then((result) => {
+      return event.track(e);
+    });
   }),
   impress: event => (function impressionListener(e) {
     return event.fetch(e).then((result) => {
-      event.track(e).then((result) => {
-        console.log('track result:', { result });
-      });
+      return event.track(e);
     });
   }),
 };

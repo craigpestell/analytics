@@ -9,7 +9,7 @@ export default (target) => {
      */
   Object.assign(target, {
 
-    getEL() {
+    getEl() {
       const applicableElements = (this.selectorIsId) ? [document.getElementById(this.selector)] : document.querySelectorAll(this.selector);
       return Array.from(applicableElements).filter(el => el != null);
     },
@@ -23,8 +23,8 @@ export default (target) => {
             {
               this.getEl().forEach((el) => {
                 event.listener = (e) => {
-                  listeners.impress(event)(e).then((result) => {
-                    event.track(e).then((result) => {
+                  return listeners.impress(event)(e).then((result) => {
+                    return event.track(e).then((result) => {
                       console.log('track result:', { result });
                     });
                   });

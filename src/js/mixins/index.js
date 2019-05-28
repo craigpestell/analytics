@@ -1,6 +1,6 @@
-import domEventMixin from './domEvent';
+import domElementMixin from './domElement';
 import marionetteViewMixin from './marionetteView';
 
-export default { domEventMixin, marionetteViewMixin };
-export * from './domEvent';
+export default { domElementMixin, marionetteViewMixin };
+export * from './domElement';
 export * from './marionetteView';

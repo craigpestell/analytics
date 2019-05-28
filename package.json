@@ -47,10 +47,12 @@
     "graphql": "^14.2.1",
     "lodash": "^4.17.4",
     "nodemon": "^1.18.8",
+    "scroll-into-view": "^1.9.7",
     "typescript": "^3.4.5"
   },
   "dependencies": {
     "@component/common": "^1.0.0",
+    "@component/experiment": "^0.11.0",
     "analytics": "0.0.21",
     "apollo-boost": "^0.3.1",
     "apollo-cache-inmemory": "^1.5.1",
@@ -61,6 +63,7 @@
     "graphql-binding": "^2.5.1",
     "graphql-tag": "^2.10.1",
     "graphql-tools": "^4.0.4",
+    "jasmine": "^3.4.0",
     "reflect-metadata": "^0.1.13"
   },
   "scripts": {

@@ -1,9 +1,10 @@
-describe('refactored-analytics', () => {
+
+describe('analytics', () => {
   let data;
 
   beforeEach(() => {
     loadFixtures('main.html'); // fixtures/html/main.html becomes your DOM
-    data = getJSONFixture('refactored-analytics.json');
+    data = getJSONFixture('analytics.json');
   });
 
   it('should have tests', () => {

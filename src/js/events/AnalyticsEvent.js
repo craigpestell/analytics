@@ -1,11 +1,11 @@
 import { EVENT_TYPE } from '../util/constants';
-import {default as AnalyticsController} from '../analytics';
+import { default as AnalyticsController } from '../analytics';
 
 export default class AnalyticsEvent {
   constructor(
     name,
     eventType = EVENT_TYPE.link.toString(),
-    options = { data: {}, dataMap: {}, selector: null }
+    options = { data: {}, dataMap: {}, selector: null },
   ) {
     this._name = name;
     this._type = eventType;
@@ -22,41 +22,47 @@ export default class AnalyticsEvent {
     if (keys.length > 0) {
       const entries = Object.entries(this.dataMap);
       const promiseArr = entries.map(([name, listener]) => {
-        if(typeof listener == 'function') {
+        if (typeof listener === 'function') {
           const listenerResult = listener(context);
           return listenerResult;
-        } else {
-          return listener;
         }
-      })      
-      return await Promise.all(promiseArr)
-    } else {
-      return new Promise((resolve) => resolve({}));
+        return listener;
+      });
+      return await Promise.all(promiseArr);
     }
+    return new Promise(resolve => resolve({}));
   }
 
   fetch(context) {
     const event = this;
     return new Promise((resolve) => {
-      this.fetchMap(context).then((mapResults) =>{
+      this.fetchMap(context).then((mapResults) => {
         Object.assign(event.data, mapResults);
         resolve(event.data);
-      })
-    })
+      });
+    });
   }
-  
-  track(context){
+
+  track(context) {
     const event = this;
     return event.fetch(context)
       .then((data) => {
-          AnalyticsController.logEvent(event, data)
-          return AnalyticsController.track(event.type, data)
+        AnalyticsController.logEvent(event, data);
+        return AnalyticsController.track(event.type, data);
       });
   }
-  
+
   set dataMap(dataMap) {
     this._dataMap = Object.assign(this._dataMap, dataMap || {});
   }
+
+  set listener(listener) {
+    this._listener = listener;
+  }
+  get listener() {
+    return this._listener;
+  }
+
 
   get dataMap() {
     return this._dataMap;
@@ -78,7 +84,7 @@ export default class AnalyticsEvent {
     return this._async;
   }
 
-  get selector(){ 
+  get selector() {
     return this._selector;
   }
 

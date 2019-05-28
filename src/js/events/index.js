@@ -20,14 +20,6 @@ export const ANALYTICS_EVENT = {
     initialized: () => (new AnalyticsEvent('EVENT.View.initialized', EVENT_TYPE.view)),
     viewed: () => (new AnalyticsEvent('EVENT.View.viewed', EVENT_TYPE.view)),
   },
-
-  Analytics: {
-    initialized: () => (new AnalyticsEvent('EVENT.Analytics.initialized'), EVENT_TYPE.analytics),
-  },
-  Event: {
-    added: () => (new AnalyticsEvent('EVENT.Analytics.added')),
-    fetchDataMap: () => (new AnalyticsEvent('EVENT.Analytics.dataMapFetched')),
-  },
 };
 
 export default ANALYTICS_EVENT;

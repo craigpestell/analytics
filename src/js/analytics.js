@@ -22,8 +22,6 @@ export class AnalyticsController {
     });
     this._analytics.storage.removeItem('analyticsEvents');
     this._analytics.storage.removeItem('eventLog');
-    this.getEvents = this.getEvents.bind(this);
-    this.getLog = this.getLog.bind(this);
     this.track = this.track.bind(this);
   }
 
@@ -35,7 +33,6 @@ export class AnalyticsController {
      */
   track(type, data) {
     this._analytics.track(type, data);
-    this.logEvent(type, data);
     return true;
   }
   // TODO: this currently accepts an object hashmap but should also accept an array of events
@@ -54,7 +51,6 @@ export class AnalyticsController {
         event.fetch()
           .then((data) => {
             this._analytics.track(event.type, data);
-            this.logEvent(event, data);
           });
       };
       AnalyticsController.documentReady(event.listener);
@@ -76,23 +72,6 @@ export class AnalyticsController {
     return AnalyticsController.documentReady(cb);
   }
 
-  logEvent(event, data) {
-    /* let current = this._analytics.storage.getItem('eventLog');
-        if( !current ) {
-            current = []
-        }else{
-            current.push([{event, data, timestamp: new Date()}])
-        }
-        this._analytics.storage.setItem('eventLog', current) */
-  }
-
-  getEvents() {
-    return this._analytics.storage.getItem('analyticsEvents');
-  }
-
-  getLog() {
-    return this._analytics.storage.getItem('eventLog');
-  }
 }
 
 export default (new AnalyticsController({ brand: 'mcom' }));

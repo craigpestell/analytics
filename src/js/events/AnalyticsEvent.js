@@ -47,7 +47,6 @@ export default class AnalyticsEvent {
     const event = this;
     return event.fetch(context)
       .then((data) => {
-        AnalyticsController.logEvent(event, data);
         return AnalyticsController.track(event.type, data);
       });
   }
@@ -62,7 +61,6 @@ export default class AnalyticsEvent {
   get listener() {
     return this._listener;
   }
-
 
   get dataMap() {
     return this._dataMap;

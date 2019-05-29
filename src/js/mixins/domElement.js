@@ -8,8 +8,7 @@ export default (target) => {
     return Array.from(applicableElements).filter(el => el != null);
   }
 
-  Object.assign(target, {
-
+  const getMixin = () => ({
     getEl() {
       return getDomElements(document, target);
     },
@@ -44,6 +43,8 @@ export default (target) => {
       }
     },
   });
+
+  Object.assign(target, getMixin());
 
   // init.
   AnalyticsController.documentReady(() => {

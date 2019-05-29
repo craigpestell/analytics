@@ -8,23 +8,26 @@ describe('Analytics module', () => {
   });
 
 
-  describe('when adding a view event', () => {
-    let eventTrackSpy;
+  describe('documentReady', () => {
+    describe('while page is loading', () => {
+      let eventTrackSpy, readySpy;
 
-    beforeEach(() => {
-      loadFixtures('main.html');
-      const viewEvent = new AnalyticsEvent('test view event', EVENT_TYPE.view, { data: { test: 'test data' } });
-      eventTrackSpy = spyOn(viewEvent, 'track');
-    });
+      beforeEach(() => {
+        loadFixtures('main.html');
+        readySpy = spyOn(document, 'readyState').and.returnValue('loading')
+        const viewEvent = new AnalyticsEvent('test view event', EVENT_TYPE.view, { data: { test: 'test data' } });
+        eventTrackSpy = spyOn(viewEvent, 'track');
+      });
 
-    /* it('should track the view event on page load', () => {
+      it('should not invoke callback', () => {
         AnalyticsController.documentReady(() => {
           setTimeout(() => {
-            expect(eventTrackSpy).toHaveBeenCalled();
+            expect(readySpy).not.toHaveBeenCalled();
           })
 
         });
-      }) */
+      })
+    });
   });
 });
 

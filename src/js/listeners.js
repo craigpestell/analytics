@@ -17,11 +17,8 @@ export const intersectionObserver = new IntersectionObserver(
 );
 
 const domListener = (event) => {
-  console.log('return domListener')
   return (e) => {
-    console.log('return fetch')
     return event.fetch(e).then((result) => { 
-      console.log('return track')
       return event.track(e);
     });
   }

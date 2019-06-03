@@ -3,7 +3,6 @@ export const OBSERVER_TYPE = Object.freeze({
 });
 
 export const EVENT_TYPE = Object.freeze({
-  [Symbol.toPrimitive]: hint => this.name,
   view: 'view', // Tealium page view event
   link: 'link', // Tealium link event
   impression: 'impression', // IntersectionObserver event - we should report this as a 'link' event to Tealium.

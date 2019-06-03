@@ -1,5 +1,5 @@
 import AnalyticsEvent from '../../../../src/js/events/AnalyticsEvent';
-import EVENT_TYPE from '../../../../src/js/util/constants';
+import { EVENT_TYPE } from '../../../../src/js/util/constants';
 
 describe('AnalyticsEvent', () => {
   let fetchData;
@@ -40,97 +40,94 @@ describe('AnalyticsEvent', () => {
         });
 
         it('should return an empty object', (done) => {
-          event.fetchMap()
-            .then((result) => {
-              expect(result).toEqual({});
-              done();
-            });
+          event.fetchMap().then((result) => {
+            expect(result).toEqual({});
+            done();
+          });
         });
       });
 
       describe('when provided an object containing a value', () => {
+        const dataMap = {
+          test: { 'test attr': 'test data' },
+        };
         beforeEach(() => {
-          dataMap = {
-            test: { 'test attr': 'test data' },
-          };
           event = new AnalyticsEvent('fetchTest', EVENT_TYPE.link, { dataMap });
         });
 
         it('should return the same value', (done) => {
-          event.fetchMap()
-            .then((result) => {
-              expect(result).toEqual([{ 'test attr': 'test data' }]);
-              done();
-            });
+          event.fetchMap().then((result) => {
+            expect(result).toEqual([{ 'test attr': 'test data' }]);
+            done();
+          });
         });
       });
     });
 
     describe('fetch', () => {
-      let event,
-        dataMap;
-
       describe('when provided an Object containing a function that returns a promise', () => {
-        beforeEach(() => {
-          dataMap = {
-            test: () => (new Promise((resolve) => {
+        let event;
+        const dataMap = {
+          test: () =>
+            new Promise((resolve) => {
               resolve({ test: 'test' });
-            })),
-          };
+            }),
+        };
+        beforeEach(() => {
           event = new AnalyticsEvent('fetchTest', EVENT_TYPE.link, { dataMap });
         });
 
         it('should return Promise data', (done) => {
           spyOn(event, 'fetchMap').and.returnValue(Promise.resolve(fetchData));
-          event.fetch()
-            .then((result) => {
-              expect(event.fetchMap).toHaveBeenCalled();
-              expect(result).toEqual({ test: 'test', event_name: 'fetchTest' });
-              done();
-            });
+          event.fetch().then((result) => {
+            expect(event.fetchMap).toHaveBeenCalled();
+            expect(result).toEqual({ test: 'test', event_name: 'fetchTest' });
+            done();
+          });
         });
       });
 
       describe('when provided an object containing a value', () => {
+        let event;
+        const dataMap = {
+          test: { 'test attr': 'test data' },
+        };
         beforeEach(() => {
-          dataMap = {
-            test: { 'test attr': 'test data' },
-          };
           event = new AnalyticsEvent('fetchTest', EVENT_TYPE.link, { dataMap });
         });
 
         it('should return the same value', (done) => {
           spyOn(event, 'fetchMap').and.returnValue(Promise.resolve({ 'test attr': 'test data' }));
-          event.fetch()
-            .then((result) => {
-              expect(event.fetchMap).toHaveBeenCalled();
-              expect(result).toEqual({ 'test attr': 'test data', event_name: 'fetchTest' });
-              done();
-            });
+          event.fetch().then((result) => {
+            expect(event.fetchMap).toHaveBeenCalled();
+            expect(result).toEqual({ 'test attr': 'test data', event_name: 'fetchTest' });
+            done();
+          });
         });
       });
     });
 
     describe('track function', () => {
-      beforeEach(() => {
-        dataMap = {
-          test: () => (new Promise((resolve) => {
+      let event;
+      const dataMap = {
+        test: () =>
+          new Promise((resolve) => {
             resolve({ test: 'test' });
-          })),
-        };
+          }),
+      };
+
+      beforeEach(() => {
         event = new AnalyticsEvent('test', EVENT_TYPE.link, { dataMap });
       });
 
       it('should call fetch and return true', (done) => {
         spyOn(event, 'fetch').and.returnValue(Promise.resolve(fetchData));
-        event.track()
-          .then((result) => {
-            expect(event.fetch).toHaveBeenCalled();
-            expect(result).toEqual(true);
-            done();
-          });
+        event.track().then((result) => {
+          expect(event.fetch).toHaveBeenCalled();
+          expect(result).toEqual(true);
+          done();
+        });
       });
     });
   });
 });
-

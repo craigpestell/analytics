@@ -16,16 +16,11 @@ export const intersectionObserver = new IntersectionObserver(
   },
 );
 
-const domListener = (event) => {
-  return (e) => {
-    return event.fetch(e).then((result) => { 
-      return event.track(e);
-    });
-  }
-}
+const domListener = event => e => event.fetch(e).then(event.track(e));
 
-export default {
+export const listeners = {
   view: domListener,
   click: domListener,
-  impress: domListener
-}
+  impress: domListener,
+};
+export default listeners;

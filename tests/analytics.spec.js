@@ -1,4 +1,3 @@
-
 describe('analytics', () => {
   let data;
 

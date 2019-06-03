@@ -1,5 +1,5 @@
 // basic template events.
-import ANALYTICS_EVENT from '../../../../src/js/events';
+import { ANALYTICS_EVENT } from '../../../../src/js/events';
 import AnalyticsEvent from '../../../../src/js/events/AnalyticsEvent';
 import { EVENT_TYPE } from '../../../../src/js/util/constants';
 

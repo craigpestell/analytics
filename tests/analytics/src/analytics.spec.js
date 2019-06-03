@@ -1,33 +1,23 @@
-import AnalyticsController from '../../../src/js/analytics';
-import AnalyticsEvent from '../../../src/js/events/AnalyticsEvent';
-import { EVENT_TYPE } from '../../../src/js/util/constants';
+import Analytics from '../../../src/js/analytics';
 
 describe('Analytics module', () => {
   it('should return a singleton instance object', () => {
-    expect(AnalyticsController).toEqual(jasmine.any(Object));
+    expect(Analytics).toEqual(jasmine.any(Object));
   });
-
-
   describe('documentReady', () => {
     describe('while page is loading', () => {
-      let eventTrackSpy, readySpy;
-
+      let readySpy;
       beforeEach(() => {
         loadFixtures('main.html');
-        readySpy = spyOn(document, 'readyState').and.returnValue('loading')
-        const viewEvent = new AnalyticsEvent('test view event', EVENT_TYPE.view, { data: { test: 'test data' } });
-        eventTrackSpy = spyOn(viewEvent, 'track');
+        readySpy = spyOn(document, 'readyState').and.returnValue('loading');
       });
-
-      it('should not invoke callback', () => {
-        AnalyticsController.documentReady(() => {
+      it('should not invoke callback before DOM is ready', () => {
+        Analytics.documentReady(() => {
           setTimeout(() => {
             expect(readySpy).not.toHaveBeenCalled();
-          })
-
+          });
         });
-      })
+      });
     });
   });
 });
-

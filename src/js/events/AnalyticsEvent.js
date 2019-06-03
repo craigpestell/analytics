@@ -1,12 +1,8 @@
 import { EVENT_TYPE } from '../util/constants';
-import { default as AnalyticsController } from '../analytics';
+import Analytics from '../analytics';
 
 export default class AnalyticsEvent {
-  constructor(
-    name,
-    eventType = EVENT_TYPE.link.toString(),
-    options = { data: {}, dataMap: {}, selector: null },
-  ) {
+  constructor(name, eventType = EVENT_TYPE.link.toString(), options = { data: {}, dataMap: {}, selector: null }) {
     this._name = name;
     this._type = eventType;
     this._dataMap = options.dataMap || {};
@@ -15,19 +11,21 @@ export default class AnalyticsEvent {
     this.fetch = this.fetch.bind(this);
     this.track = this.track.bind(this);
     this._listener = undefined;
+    Analytics.addEvent(this);
   }
 
   async fetchMap(context) {
     const keys = Object.keys(this.dataMap);
     if (keys.length > 0) {
       const entries = Object.entries(this.dataMap);
-      const promiseArr = entries.map(([name, listener]) => {
+      const promiseArr = entries.map(([, listener]) => {
         if (typeof listener === 'function') {
           const listenerResult = listener(context);
           return listenerResult;
         }
         return listener;
       });
+      // eslint-disable-next-line  no-return-await
       return await Promise.all(promiseArr);
     }
     return new Promise(resolve => resolve({}));
@@ -45,10 +43,7 @@ export default class AnalyticsEvent {
 
   track(context) {
     const event = this;
-    return event.fetch(context)
-      .then((data) => {
-        return AnalyticsController.track(event.type, data);
-      });
+    return event.fetch(context).then(data => Analytics.track(event.type, data));
   }
 
   set dataMap(dataMap) {
@@ -86,7 +81,7 @@ export default class AnalyticsEvent {
     return this._selector;
   }
 
-  [Symbol.toPrimitive](hint) {
+  [Symbol.toPrimitive]() {
     return this.name;
   }
 

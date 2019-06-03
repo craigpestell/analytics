@@ -1,7 +1,6 @@
-import domElementMixin from './domElement';
-// import marionetteViewMixin from './marionetteView';
+import { domElementMixin } from './domElement';
+import { marionetteViewMixin } from './marionetteView';
 
-// export default { domElementMixin, marionetteViewMixin };
-export default { domElementMixin };
+export default { domElementMixin, marionetteViewMixin };
 export * from './domElement';
-// export * from './marionetteView';
+export * from './marionetteView';

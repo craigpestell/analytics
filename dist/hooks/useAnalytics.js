@@ -57,8 +57,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
                 properties,
             });
             analytics.pageview({ Auth0Id, category, name, properties });
-            setTimestamp(now);
-            setTimerThreshold(false);
+            //setTimerThreshold(false);
         }
         //}
     }, [timerThreshold]);

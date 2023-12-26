@@ -89,8 +89,7 @@ export const usePageView = ({
       });
 
       analytics.pageview({ Auth0Id, category, name, properties });
-      setTimestamp(now);
-      setTimerThreshold(false);
+      //setTimerThreshold(false);
     }
     //}
   }, [timerThreshold]);

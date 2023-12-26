@@ -66,7 +66,7 @@ export const usePageView = ({
   useEffect(() => {
     const now = Date.now() / 1000;
 
-    const sameProps = !isEqualShallow(
+    const sameProps = isEqualShallow(
       { Auth0Id, category, name, properties },
       pageViewProps,
     );

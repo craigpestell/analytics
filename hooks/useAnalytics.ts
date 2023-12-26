@@ -27,7 +27,7 @@ function isEqualShallow(a: any, b: any) {
   return true;
 }
 
-interface UsePageViewProps extends PageViewProps {
+export interface UsePageViewProps extends PageViewProps {
   router: NextRouter;
 }
 const usePageView = ({

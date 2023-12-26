@@ -1,6 +1,6 @@
 import Analytics, { PageViewProps } from './lib/analytics';
-import usePageView from './hooks/useAnalytics';
+import usePageView, {UsePageViewProps} from './hooks/useAnalytics';
 
-export { Analytics, type PageViewProps, usePageView };
+export { Analytics, type PageViewProps, type UsePageViewProps, usePageView };
 
 export default Analytics;

@@ -1,51 +1,26 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usePageView = exports.useAnalytics = void 0;
-const analytics_node_1 = require("@segment/analytics-node");
-const analytics_1 = __importStar(require("../lib/analytics"));
+const analytics_1 = __importDefault(require("../lib/analytics"));
 const react_1 = require("react");
 function isEqualShallow(a, b) {
     return JSON.stringify(a) === JSON.stringify(b);
 }
 const useAnalytics = ({ Auth0Id, }) => {
-    const analytics = new analytics_node_1.Analytics({ writeKey: analytics_1.SEGMENT_WRITE_KEY });
+    // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
+    const analytics = (0, analytics_1.default)();
     return {
         track: ({ type = 'track', event, properties, }) => {
-            const userTrack = {
-                userId: Auth0Id,
+            const trackParams = {
+                Auth0Id: Auth0Id !== null && Auth0Id !== void 0 ? Auth0Id : '',
                 event,
+                type,
                 properties: Object.assign({}, properties),
             };
-            const anonTrack = {
-                anonymousId: 'anonymous',
-                event,
-                properties: Object.assign({}, properties),
-            };
-            const e = Auth0Id ? userTrack : anonTrack;
-            analytics.track(e);
+            analytics.track(trackParams);
         },
     };
 };

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SEGMENT_WRITE_KEY = void 0;
 const analytics_node_1 = require("@segment/analytics-node");
 exports.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
-const Analytics = ({ router }) => {
+const Analytics = ({ router } = {}) => {
     const analytics = new analytics_node_1.Analytics({
         writeKey: `${exports.SEGMENT_WRITE_KEY}`,
     }).on('error', console.error);
@@ -32,14 +32,10 @@ const Analytics = ({ router }) => {
             analytics.page(pageParams);
         },
         track: ({ Auth0Id, type = 'track', event, properties, }) => {
-            const e = {
-                userId: Auth0Id,
-                type,
-                event,
-                properties: Object.assign({}, properties),
-            };
-            console.log('track: ', e);
-            analytics.track(e);
+            const identifyParams = Auth0Id ? { userId: Auth0Id } : { anonymousId: 'anonymous' };
+            const trackParams = Object.assign({ event, properties: Object.assign({}, properties) }, identifyParams);
+            console.log('track: ', trackParams);
+            analytics.track(trackParams);
         },
     };
 };

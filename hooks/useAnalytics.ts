@@ -1,5 +1,6 @@
 import { NextRouter } from 'next/router';
 import {
+  IdentifyParams,
   Analytics as SegmentAnalytics,
   TrackParams,
 } from '@segment/analytics-node';
@@ -20,9 +21,8 @@ export const useAnalytics = ({
 }: {
   Auth0Id?: string;
 }) => {
-  const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
-
-
+  // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
+  const analytics = Analytics();
   return {
     track: ({
       type = 'track',
@@ -33,24 +33,17 @@ export const useAnalytics = ({
       event: string;
       properties: Object;
     }) => {
-      const userTrack: TrackParams = {
-        userId: Auth0Id as string,
+
+      const trackParams = {
+        Auth0Id: Auth0Id??'',
         event,
+        type,
         properties: {
           ...properties,
         },
       };
 
-      const anonTrack: TrackParams = {
-        anonymousId: 'anonymous',
-        event,
-        properties: {
-          ...properties,
-        },
-      };
-
-      const e: TrackParams = Auth0Id ? userTrack : anonTrack;
-      analytics.track(e);
+      analytics.track(trackParams);
     },
   };
 };

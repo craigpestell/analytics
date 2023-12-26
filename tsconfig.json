@@ -15,11 +15,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "*": [
-          "node_modules/*",
-          "src/types/*"
-      ]
+      "@/*": ["./*"]
   },
   },
   "include": ["lib/**/*.ts", "hooks/**/*.ts"],

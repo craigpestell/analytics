@@ -26,8 +26,9 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     function isEqualShallow(a, b) {
         return JSON.stringify(a) === JSON.stringify(b);
     }
+    const now = Math.round(Date.now() / 1000);
     const analytics = (0, analytics_1.default)({ router });
-    const [timestamp, setTimestamp] = (0, react_1.useState)(0);
+    const [timestamp, setTimestamp] = (0, react_1.useState)(now);
     const [pageViewProps, setPageViewProps] = (0, react_1.useState)({
         Auth0Id,
         category,
@@ -42,7 +43,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
             ? true
             : !!router.query.id;
         const pageViewTimeThresholdMet = now - timestamp > 30;
-        console.log({ timestamp });
+        // console.log({ timestamp });
         //console.log({ pageViewTimeThresholdMet, now, timestamp });
         if (Auth0Id && paramsResolved && (!sameProps || pageViewTimeThresholdMet)) {
             setTimestamp(now);

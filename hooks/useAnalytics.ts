@@ -52,9 +52,10 @@ export const usePageView = ({
   function isEqualShallow(a: any, b: any) {
     return JSON.stringify(a) === JSON.stringify(b);
   }
+  const now = Math.round(Date.now() / 1000);
 
   const analytics = Analytics({ router });
-  const [timestamp, setTimestamp] = useState<number>(0);
+  const [timestamp, setTimestamp] = useState<number>(now);
   const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
     Auth0Id,
     category,
@@ -77,7 +78,7 @@ export const usePageView = ({
         : !!router.query.id;
 
     const pageViewTimeThresholdMet = now - timestamp > 30;
-    console.log({ timestamp });
+    // console.log({ timestamp });
     //console.log({ pageViewTimeThresholdMet, now, timestamp });
     if (Auth0Id && paramsResolved && (!sameProps || pageViewTimeThresholdMet)) {
       setTimestamp(now);

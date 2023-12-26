@@ -56,6 +56,9 @@ export const usePageView = ({
 
   const analytics = Analytics({ router });
   const [timestamp, setTimestamp] = useState<number>(now);
+
+  const [timerThreshold, setTimerThreshold] = useState<boolean>(false);
+
   const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
     Auth0Id,
     category,
@@ -65,24 +68,19 @@ export const usePageView = ({
 
   useEffect(() => {
     const now = Math.round(Date.now() / 1000);
+    const timer = setTimeout(() => {
+      setTimerThreshold(true);
+      setPageViewProps({
+        Auth0Id,
+        category,
+        name,
+        properties,
+      });
+      clearTimeout(timer);
+    }, 5000);
 
-    const sameProps = isEqualShallow(
-      { Auth0Id, category, name, properties },
-      pageViewProps,
-    );
-
-    const paramsResolved =
-      !router?.pathname.includes('[id]') &&
-      !router?.pathname.includes('[...id]')
-        ? true
-        : !!router.query.id;
-
-    const pageViewTimeThresholdMet = now - timestamp > 30;
-    // console.log({ timestamp });
-    //console.log({ pageViewTimeThresholdMet, now, timestamp });
-    if (Auth0Id && paramsResolved && (!sameProps || pageViewTimeThresholdMet)) {
-      setTimestamp(now);
-
+    setTimestamp(now);
+    if (timerThreshold) {
       setPageViewProps({
         Auth0Id,
         category,
@@ -91,16 +89,11 @@ export const usePageView = ({
       });
 
       analytics.pageview({ Auth0Id, category, name, properties });
+      setTimestamp(now);
+      setTimerThreshold(false);
     }
-  }, [
-    Auth0Id,
-    category,
-    name,
-    properties,
-    pageViewProps,
-    analytics,
-    timestamp,
-  ]);
+    //}
+  }, [timerThreshold]);
 };
 
 export default { useAnalytics, usePageView };

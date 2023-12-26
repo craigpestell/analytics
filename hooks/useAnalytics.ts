@@ -12,7 +12,6 @@ import Analytics, {
 } from '../lib/analytics';
 import { useEffect, useState } from 'react';
 
-
 export const useAnalytics = ({ Auth0Id }: { Auth0Id?: string }) => {
   // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
   const analytics = Analytics();
@@ -55,7 +54,7 @@ export const usePageView = ({
     console.log(JSON.stringify(b));
     return JSON.stringify(a) === JSON.stringify(b);
   }
-  
+
   const analytics = Analytics({ router });
   const [timestamp, setTimestamp] = useState<number>(0);
   const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
@@ -73,14 +72,21 @@ export const usePageView = ({
       pageViewProps,
     );
 
-    console.log({router})
+    console.log({ router });
     console.log({ sameProps }, { elapsed: now - timestamp });
 
-    const paramsResolved = ((router?.pathname.includes("[id]") || router?.pathname.includes("[...id]") && router.query.id)) || true;
+    const paramsResolved =
+      !router?.pathname.includes('[id]') &&
+      !router?.pathname.includes('[...id]')
+        ? true
+        : !!router.query.id;
 
-    console.log({paramsResolved, sameProps, timeElapsed:(now - timestamp > 15)})
-    if (paramsResolved && !sameProps || (now - timestamp > 15)) {
-
+    console.log({
+      paramsResolved,
+      sameProps,
+      timeElapsed: now - timestamp > 15,
+    });
+    if ((paramsResolved && !sameProps) || now - timestamp > 15) {
       setPageViewProps({
         Auth0Id,
         category,

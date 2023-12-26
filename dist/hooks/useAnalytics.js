@@ -41,8 +41,11 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
             !(router === null || router === void 0 ? void 0 : router.pathname.includes('[...id]'))
             ? true
             : !!router.query.id;
-        if (Auth0Id && paramsResolved && !sameProps) {
+        const pageViewTimeThresholdMet = now - timestamp > 30;
+        if (Auth0Id &&
+            ((paramsResolved && !sameProps) || pageViewTimeThresholdMet)) {
             console.log({
+                pageViewTimeThresholdMet,
                 router,
                 //elapsed: now - timestamp,
                 paramsResolved,

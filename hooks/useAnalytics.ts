@@ -54,7 +54,8 @@ const usePageView = ({
       { pathname: router.asPath, Auth0Id, category, name, properties },
       pageViewProps,
     );
-    console.log({ sameProps });
+    
+    console.log({ sameProps }, {imestamp: Date.now()});
     //if (Auth0Id && category && name && router.pathname) {
     if (!sameProps) {
       console.log({ Auth0Id, category, name, properties });
@@ -69,7 +70,7 @@ const usePageView = ({
       analytics.pageview({ Auth0Id, category, name, properties });
     }
     //}
-  }, [Auth0Id, category, name, properties, pageViewProps, analytics, router]);
+  }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
 };
 
 export default usePageView;

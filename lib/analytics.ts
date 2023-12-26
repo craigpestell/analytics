@@ -1,5 +1,5 @@
 import { NextRouter } from 'next/router';
-import { Analytics as SegmentAnalytics } from '@segment/analytics-node';
+import { PageParams, Analytics as SegmentAnalytics } from '@segment/analytics-node';
 
 const SEGMENT_WRITE_KEY =
   process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
@@ -9,13 +9,13 @@ const SEGMENT_WRITE_KEY =
 type EventType = 'track' | 'page' | 'identify' | 'group' | 'alias' | 'screen';
 
 export type PageViewProps = {
-  Auth0Id?: string;
+  Auth0Id: string;
   category: string;
   name: string;
   properties?: Object;
 };
 
-const Analytics = ({ router }: { router: NextRouter }) => {
+const Analytics = ({ router }: { router?: NextRouter }) => {
   const analytics = new SegmentAnalytics({
     writeKey: `${SEGMENT_WRITE_KEY}`,
   }).on('error', console.error);
@@ -35,17 +35,16 @@ const Analytics = ({ router }: { router: NextRouter }) => {
           }
         }
         */
-      if (router.pathname && Auth0Id) {
-        analytics.page({
-          userId: Auth0Id,
-          category,
-          name,
-          properties: {
-            ...properties,
-            url: router.pathname,
-          },
-        });
-      }
+      const pageParams:PageParams = {
+        userId: Auth0Id,
+        category,
+        name,
+        properties: {
+          ...properties,
+        },
+      };
+
+      analytics.page(pageParams);
     },
     track: ({
       Auth0Id,

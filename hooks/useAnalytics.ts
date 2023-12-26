@@ -26,13 +26,15 @@ function isEqualShallow(a:any, b:any) {
 
   return true;
 }
+
+type UsePageViewProps = { router: NextRouter } & PageViewProps
 const usePageView = ({
   router,
   Auth0Id,
   category,
   name,
   properties,
-}: { router: NextRouter } & PageViewProps) => {
+}: UsePageViewProps) => {
   const analytics = Analytics({ router });
   const [pageViewProps, setPageViewProps] = useState<
     { pathname: string } & PageViewProps

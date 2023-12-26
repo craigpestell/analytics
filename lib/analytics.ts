@@ -47,6 +47,7 @@ const Analytics = ({ router }: { router?: NextRouter }) => {
         },
       };
 
+      console.log('page:', pageParams);
       analytics.page(pageParams);
     },
     track: ({

@@ -30,7 +30,8 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     (0, react_1.useEffect)(() => {
         const now = Date.now() / 1000;
         const sameProps = !isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
-        console.log({ sameProps }, { elapsed: now - timestamp });
+        
+        //console.log({ sameProps }, { elapsed: now - timestamp });
         //if (Auth0Id && category && name && router.pathname) {
         if (!sameProps || now - timestamp > 5) {
             console.log({ Auth0Id, category, name, properties });
@@ -40,7 +41,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
                 name,
                 properties,
             });
-            console.log('pageview:', { Auth0Id, category, name, properties })
+            //console.log('pageview:', { Auth0Id, category, name, properties })
             analytics.pageview({ Auth0Id, category, name, properties });
             setTimestamp(now);
         }

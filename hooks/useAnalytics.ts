@@ -44,10 +44,10 @@ const usePageView = ({
       pageViewProps,
     );
 
-    console.log({ sameProps }, { elapsed: now - timestamp });
+    //console.log({ sameProps }, { elapsed: now - timestamp });
     //if (Auth0Id && category && name && router.pathname) {
     if (!sameProps || now - timestamp > 5) {
-      console.log({ Auth0Id, category, name, properties });
+      // console.log({ Auth0Id, category, name, properties });
 
       setPageViewProps({
         Auth0Id,
@@ -55,6 +55,7 @@ const usePageView = ({
         name,
         properties,
       });
+      
       analytics.pageview({ Auth0Id, category, name, properties });
       setTimestamp(now);
     }

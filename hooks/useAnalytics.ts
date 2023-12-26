@@ -50,8 +50,6 @@ export const usePageView = ({
   properties,
 }: UsePageViewProps) => {
   function isEqualShallow(a: any, b: any) {
-    console.log(JSON.stringify(a));
-    console.log(JSON.stringify(b));
     return JSON.stringify(a) === JSON.stringify(b);
   }
 

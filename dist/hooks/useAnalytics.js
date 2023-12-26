@@ -30,17 +30,10 @@ const react_1 = require("react");
 function isEqualShallow(a, b) {
     return JSON.stringify(a) === JSON.stringify(b);
 }
-const useAnalytics = ({ Auth0Id, type = 'track', event, properties, }) => {
+const useAnalytics = ({ Auth0Id, }) => {
     const analytics = new analytics_node_1.Analytics({ writeKey: analytics_1.SEGMENT_WRITE_KEY });
-    const e = {
-        userId: Auth0Id,
-        type,
-        event,
-        properties: Object.assign({}, properties),
-    };
-    analytics.track(e);
     return {
-        track: ({ Auth0Id, type = 'track', event, properties, }) => {
+        track: ({ type = 'track', event, properties, }) => {
             const userTrack = {
                 userId: Auth0Id,
                 event,

@@ -17,35 +17,18 @@ function isEqualShallow(a: any, b: any) {
 
 export const useAnalytics = ({
   Auth0Id,
-  type = 'track',
-  event,
-  properties,
 }: {
-  Auth0Id: string;
-  type?: EventType;
-  event: string;
-  properties: Object;
+  Auth0Id?: string;
 }) => {
   const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
 
-  const e = {
-    userId: Auth0Id,
-    type,
-    event,
-    properties: {
-      ...properties,
-    },
-  };
-  analytics.track(e);
 
   return {
     track: ({
-      Auth0Id,
       type = 'track',
       event,
       properties,
     }: {
-      Auth0Id?: string;
       type?: EventType;
       event: string;
       properties: Object;

@@ -27,6 +27,7 @@ const Analytics = ({ router }) => {
                 name,
                 properties: Object.assign({}, properties),
             };
+            console.log('page:', pageParams);
             analytics.page(pageParams);
         },
         track: ({ Auth0Id, type = 'track', event, properties, }) => {

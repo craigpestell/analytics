@@ -4,12 +4,18 @@ import {
   Analytics as SegmentAnalytics,
 } from '@segment/analytics-node';
 
-const SEGMENT_WRITE_KEY =
+export const SEGMENT_WRITE_KEY =
   process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
 
 //const analytics = AnalyticsBrowser.load({ writeKey: process.env.WRITE_KEY as string })
 
-type EventType = 'track' | 'page' | 'identify' | 'group' | 'alias' | 'screen';
+export type EventType =
+  | 'track'
+  | 'page'
+  | 'identify'
+  | 'group'
+  | 'alias'
+  | 'screen';
 
 export type PageViewProps = {
   Auth0Id: string;

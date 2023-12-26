@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SEGMENT_WRITE_KEY = void 0;
 const analytics_node_1 = require("@segment/analytics-node");
-const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
+exports.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
 const Analytics = ({ router }) => {
     const analytics = new analytics_node_1.Analytics({
-        writeKey: `${SEGMENT_WRITE_KEY}`,
+        writeKey: `${exports.SEGMENT_WRITE_KEY}`,
     }).on('error', console.error);
     return {
         pageview: ({ Auth0Id, category, name, properties }) => {

@@ -1,10 +1,76 @@
 import { NextRouter } from 'next/router';
-import Analytics, { type PageViewProps } from '../lib/analytics';
+import {
+  Analytics as SegmentAnalytics,
+  TrackParams,
+} from '@segment/analytics-node';
+
+import Analytics, {
+  type PageViewProps,
+  SEGMENT_WRITE_KEY,
+  type EventType,
+} from '../lib/analytics';
 import { useEffect, useState } from 'react';
 
 function isEqualShallow(a: any, b: any) {
-  return JSON.stringify(a) === JSON.stringify(b)
+  return JSON.stringify(a) === JSON.stringify(b);
 }
+
+const useAnalytics = ({
+  Auth0Id,
+  type = 'track',
+  event,
+  properties,
+}: {
+  Auth0Id: string;
+  type?: EventType;
+  event: string;
+  properties: Object;
+}) => {
+  const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
+
+  const e = {
+    userId: Auth0Id,
+    type,
+    event,
+    properties: {
+      ...properties,
+    },
+  };
+  analytics.track(e);
+
+  return {
+    track: ({
+      Auth0Id,
+      type = 'track',
+      event,
+      properties,
+    }: {
+      Auth0Id?: string;
+      type?: EventType;
+      event: string;
+      properties: Object;
+    }) => {
+      const userTrack: TrackParams = {
+        userId: Auth0Id as string,
+        event,
+        properties: {
+          ...properties,
+        },
+      };
+
+      const anonTrack: TrackParams = {
+        anonymousId: 'anonymous',
+        event,
+        properties: {
+          ...properties,
+        },
+      };
+
+      const e: TrackParams = Auth0Id ? userTrack : anonTrack;
+      analytics.track(e);
+    },
+  };
+};
 
 export interface UsePageViewProps extends PageViewProps {
   router?: NextRouter;
@@ -44,7 +110,7 @@ const usePageView = ({
         name,
         properties,
       });
-      
+
       analytics.pageview({ Auth0Id, category, name, properties });
       setTimestamp(now);
     }
@@ -52,4 +118,4 @@ const usePageView = ({
   }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
 };
 
-export default usePageView;
+export default { useAnalytics, usePageView };

@@ -40,6 +40,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
                 name,
                 properties,
             });
+            console.log('pageview:', { Auth0Id, category, name, properties })
             analytics.pageview({ Auth0Id, category, name, properties });
             setTimestamp(now);
         }

@@ -77,6 +77,7 @@ export const usePageView = ({
         : !!router.query.id;
 
     //const pageViewTimeThresholdMet = now - timestamp > 30;
+    console.log({ Auth0Id, paramsResolved, sameProps });
     if (Auth0Id && paramsResolved && !sameProps) {
       console.log({
         router,

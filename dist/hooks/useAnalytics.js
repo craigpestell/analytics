@@ -44,9 +44,14 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
         if (paramsResolved && !sameProps) {
             console.log({
                 router,
-                elapsed: now - timestamp,
+                //elapsed: now - timestamp,
                 paramsResolved,
                 sameProps,
+                Auth0Id,
+                category,
+                name,
+                properties,
+                pageViewProps,
             });
             setPageViewProps({
                 Auth0Id,

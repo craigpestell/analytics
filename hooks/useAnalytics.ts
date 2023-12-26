@@ -76,18 +76,10 @@ export const usePageView = ({
         ? true
         : !!router.query.id;
 
-    const pageViewTimeThresholdMet = now - timestamp > 30;
-    if (
-      Auth0Id &&
-      ((paramsResolved && !sameProps) || pageViewTimeThresholdMet)
-    ) {
+    //const pageViewTimeThresholdMet = now - timestamp > 30;
+    if (Auth0Id && paramsResolved && !sameProps) {
       console.log({
-        pageViewTimeThresholdMet,
-        now,
-        timestamp,
         router,
-        //elapsed: now - timestamp,
-        paramsResolved,
         sameProps,
         Auth0Id,
         category,

@@ -65,6 +65,11 @@ export const usePageView = ({
   useEffect(() => {
     const now = Date.now() / 1000;
 
+    console.log({ timestamp, now, elapsed: now - timestamp });
+  }, [timestamp]);
+  useEffect(() => {
+    const now = Date.now() / 1000;
+
     const sameProps = isEqualShallow(
       { Auth0Id, category, name, properties },
       pageViewProps,

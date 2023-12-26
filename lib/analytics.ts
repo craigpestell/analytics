@@ -67,7 +67,7 @@ const Analytics = ({ router }: { router?: NextRouter } = {}) => {
       Auth0Id: string;
       type?: EventType;
       event: string;
-      properties: Object;
+      properties?: Object;
     }) => {
       const identifyParams: IdentifyParams = Auth0Id
         ? { userId: Auth0Id as string }

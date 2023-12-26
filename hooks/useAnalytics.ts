@@ -16,11 +16,7 @@ function isEqualShallow(a: any, b: any) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-export const useAnalytics = ({
-  Auth0Id,
-}: {
-  Auth0Id?: string;
-}) => {
+export const useAnalytics = ({ Auth0Id }: { Auth0Id?: string }) => {
   // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
   const analytics = Analytics();
   return {
@@ -33,9 +29,8 @@ export const useAnalytics = ({
       event: string;
       properties: Object;
     }) => {
-
       const trackParams = {
-        Auth0Id: Auth0Id??'',
+        Auth0Id: Auth0Id ?? '',
         event,
         type,
         properties: {
@@ -75,9 +70,9 @@ export const usePageView = ({
       pageViewProps,
     );
 
-    //console.log({ sameProps }, { elapsed: now - timestamp });
+    console.log({ sameProps }, { elapsed: now - timestamp });
     //if (Auth0Id && category && name && router.pathname) {
-    if (!sameProps || now - timestamp > 5) {
+    if ((!sameProps && now - timestamp > 1) || now - timestamp > 5) {
       // console.log({ Auth0Id, category, name, properties });
 
       setPageViewProps({

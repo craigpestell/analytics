@@ -26,7 +26,7 @@ export type PageViewProps = {
   properties?: Object;
 };
 
-const Analytics = ({ router }:{ router?: NextRouter }={}) => {
+const Analytics = ({ router }: { router?: NextRouter } = {}) => {
   const analytics = new SegmentAnalytics({
     writeKey: `${SEGMENT_WRITE_KEY}`,
   }).on('error', console.error);
@@ -69,17 +69,17 @@ const Analytics = ({ router }:{ router?: NextRouter }={}) => {
       event: string;
       properties: Object;
     }) => {
-      const identifyParams: IdentifyParams
-       = Auth0Id ? {userId:Auth0Id as string} : {anonymousId: 'anonymous'};
+      const identifyParams: IdentifyParams = Auth0Id
+        ? { userId: Auth0Id as string }
+        : { anonymousId: 'anonymous' };
 
       const trackParams: TrackParams = {
         event,
         properties: {
           ...properties,
         },
-        ...identifyParams
+        ...identifyParams,
       };
-
 
       console.log('track: ', trackParams);
       analytics.track(trackParams);

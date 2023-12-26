@@ -32,7 +32,9 @@ const Analytics = ({ router } = {}) => {
             analytics.page(pageParams);
         },
         track: ({ Auth0Id, type = 'track', event, properties, }) => {
-            const identifyParams = Auth0Id ? { userId: Auth0Id } : { anonymousId: 'anonymous' };
+            const identifyParams = Auth0Id
+                ? { userId: Auth0Id }
+                : { anonymousId: 'anonymous' };
             const trackParams = Object.assign({ event, properties: Object.assign({}, properties) }, identifyParams);
             console.log('track: ', trackParams);
             analytics.track(trackParams);

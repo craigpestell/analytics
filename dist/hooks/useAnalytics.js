@@ -9,7 +9,7 @@ const react_1 = require("react");
 function isEqualShallow(a, b) {
     return JSON.stringify(a) === JSON.stringify(b);
 }
-const useAnalytics = ({ Auth0Id, }) => {
+const useAnalytics = ({ Auth0Id }) => {
     // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
     const analytics = (0, analytics_1.default)();
     return {
@@ -37,9 +37,9 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     (0, react_1.useEffect)(() => {
         const now = Date.now() / 1000;
         const sameProps = !isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
-        //console.log({ sameProps }, { elapsed: now - timestamp });
+        console.log({ sameProps }, { elapsed: now - timestamp });
         //if (Auth0Id && category && name && router.pathname) {
-        if (!sameProps || now - timestamp > 5) {
+        if ((!sameProps && now - timestamp > 1) || now - timestamp > 5) {
             // console.log({ Auth0Id, category, name, properties });
             setPageViewProps({
                 Auth0Id,

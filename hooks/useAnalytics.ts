@@ -2,7 +2,7 @@ import { NextRouter } from 'next/router';
 import Analytics, { type PageViewProps } from '../lib/analytics';
 import { useEffect, useState } from 'react';
 
-function isEqualShallow(a:any, b:any) {
+function isEqualShallow(a: any, b: any) {
   for (var key in a) {
     if (!(key in b) || a[key] !== b[key]) {
       return false;
@@ -27,7 +27,9 @@ function isEqualShallow(a:any, b:any) {
   return true;
 }
 
-type UsePageViewProps = { router: NextRouter } & PageViewProps
+interface UsePageViewProps extends PageViewProps {
+  router: NextRouter;
+}
 const usePageView = ({
   router,
   Auth0Id,

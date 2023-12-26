@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-  },
+    }
   },
   "include": ["index.ts", "lib/**/*.ts", "hooks/**/*.ts"],
   "exclude": ["node_modules"]

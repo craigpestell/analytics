@@ -3,18 +3,7 @@ import Analytics, { type PageViewProps } from '../lib/analytics';
 import { useEffect, useState } from 'react';
 
 function isEqualShallow(a: any, b: any) {
-  for (var key in a) {
-    if (!(key in b) || a[key] !== b[key]) {
-      return false;
-    }
-  }
-  for (var key in b) {
-    if (!(key in a) || a[key] !== b[key]) {
-      return false;
-    }
-  }
-
-  return true;
+  return JSON.stringify(a) === JSON.stringify(b)
 }
 
 export interface UsePageViewProps extends PageViewProps {

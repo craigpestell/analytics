@@ -40,7 +40,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
         const sameProps = isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
         console.log({ sameProps }, { elapsed: now - timestamp });
         //if (Auth0Id && category && name && router.pathname) {
-        if ((!sameProps) || now - timestamp > 5) {
+        if ((!sameProps) || now - timestamp > 15) {
             // console.log({ Auth0Id, category, name, properties });
             setPageViewProps({
                 Auth0Id,

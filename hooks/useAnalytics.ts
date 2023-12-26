@@ -13,6 +13,7 @@ import Analytics, {
 import { useEffect, useState } from 'react';
 
 function isEqualShallow(a: any, b: any) {
+  console.log(JSON.stringify(a), JSON.stringify(b));
   return JSON.stringify(a) === JSON.stringify(b);
 }
 

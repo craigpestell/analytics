@@ -7,6 +7,7 @@ exports.usePageView = exports.useAnalytics = void 0;
 const analytics_1 = __importDefault(require("../lib/analytics"));
 const react_1 = require("react");
 function isEqualShallow(a, b) {
+    console.log(JSON.stringify(a), JSON.stringify(b));
     return JSON.stringify(a) === JSON.stringify(b);
 }
 const useAnalytics = ({ Auth0Id }) => {

@@ -70,17 +70,16 @@ export const usePageView = ({
       pageViewProps,
     );
 
-    console.log({ router });
-    console.log({ sameProps }, { elapsed: now - timestamp });
-
     const paramsResolved =
       !router?.pathname.includes('[id]') &&
       !router?.pathname.includes('[...id]')
         ? true
         : !!router.query.id;
 
-    if ((paramsResolved && !sameProps)) {
+    if (paramsResolved && !sameProps) {
       console.log({
+        router,
+        elapsed: now - timestamp,
         paramsResolved,
         sameProps,
       });

@@ -37,14 +37,14 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     (0, react_1.useEffect)(() => {
         const now = Date.now() / 1000;
         const sameProps = isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
-        console.log({ router });
-        console.log({ sameProps }, { elapsed: now - timestamp });
         const paramsResolved = !(router === null || router === void 0 ? void 0 : router.pathname.includes('[id]')) &&
             !(router === null || router === void 0 ? void 0 : router.pathname.includes('[...id]'))
             ? true
             : !!router.query.id;
-        if ((paramsResolved && !sameProps)) {
+        if (paramsResolved && !sameProps) {
             console.log({
+                router,
+                elapsed: now - timestamp,
                 paramsResolved,
                 sameProps,
             });

@@ -79,7 +79,7 @@ export const usePageView = ({
     const pageViewTimeThresholdMet = now - timestamp > 30;
     console.log({ timestamp });
     //console.log({ pageViewTimeThresholdMet, now, timestamp });
-    if (pageViewTimeThresholdMet && Auth0Id && paramsResolved && !sameProps) {
+    if (Auth0Id && paramsResolved && (!sameProps || pageViewTimeThresholdMet)) {
       setPageViewProps({
         Auth0Id,
         category,

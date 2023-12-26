@@ -7,7 +7,8 @@ exports.usePageView = exports.useAnalytics = void 0;
 const analytics_1 = __importDefault(require("../lib/analytics"));
 const react_1 = require("react");
 function isEqualShallow(a, b) {
-    console.log(JSON.stringify(a), JSON.stringify(b));
+    console.log(JSON.stringify(a));
+    console.log(JSON.stringify(b));
     return JSON.stringify(a) === JSON.stringify(b);
 }
 const useAnalytics = ({ Auth0Id }) => {
@@ -40,7 +41,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
         const sameProps = isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
         console.log({ sameProps }, { elapsed: now - timestamp });
         //if (Auth0Id && category && name && router.pathname) {
-        if ((!sameProps) || now - timestamp > 15) {
+        if (!sameProps || (now - timestamp > 15)) {
             // console.log({ Auth0Id, category, name, properties });
             setPageViewProps({
                 Auth0Id,

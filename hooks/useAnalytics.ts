@@ -13,7 +13,8 @@ import Analytics, {
 import { useEffect, useState } from 'react';
 
 function isEqualShallow(a: any, b: any) {
-  console.log(JSON.stringify(a), JSON.stringify(b));
+  console.log(JSON.stringify(a));
+  console.log(JSON.stringify(b));
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
@@ -73,7 +74,7 @@ export const usePageView = ({
 
     console.log({ sameProps }, { elapsed: now - timestamp });
     //if (Auth0Id && category && name && router.pathname) {
-    if ((!sameProps) || now - timestamp > 15) {
+    if (!sameProps || (now - timestamp > 15)) {
       // console.log({ Auth0Id, category, name, properties });
 
       setPageViewProps({

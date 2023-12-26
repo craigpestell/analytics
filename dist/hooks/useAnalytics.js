@@ -30,28 +30,28 @@ function isEqualShallow(a, b) {
 }
 const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     const analytics = (0, analytics_1.default)({ router });
+    const [timestamp, setTimestamp] = (0, react_1.useState)(0);
     const [pageViewProps, setPageViewProps] = (0, react_1.useState)({
-        pathname: '',
         Auth0Id,
         category,
         name,
         properties,
     });
     (0, react_1.useEffect)(() => {
-        console.log({ pathname: router.pathname });
-        const sameProps = !isEqualShallow({ pathname: router.asPath, Auth0Id, category, name, properties }, pageViewProps);
-        console.log({ sameProps }, { imestamp: Date.now() });
+        const now = Date.now() / 1000;
+        const sameProps = !isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
+        console.log({ sameProps }, { elapsed: now - timestamp });
         //if (Auth0Id && category && name && router.pathname) {
-        if (!sameProps) {
+        if (!sameProps || now - timestamp > 15) {
             console.log({ Auth0Id, category, name, properties });
             setPageViewProps({
-                pathname: router.asPath,
                 Auth0Id,
                 category,
                 name,
                 properties,
             });
             analytics.pageview({ Auth0Id, category, name, properties });
+            setTimestamp(now);
         }
         //}
     }, [Auth0Id, category, name, properties, pageViewProps, analytics]);

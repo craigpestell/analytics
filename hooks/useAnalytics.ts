@@ -28,7 +28,7 @@ function isEqualShallow(a: any, b: any) {
 }
 
 export interface UsePageViewProps extends PageViewProps {
-  router: NextRouter;
+  router?: NextRouter;
 }
 const usePageView = ({
   router,
@@ -38,10 +38,8 @@ const usePageView = ({
   properties,
 }: UsePageViewProps) => {
   const analytics = Analytics({ router });
-  const [pageViewProps, setPageViewProps] = useState<
-    { pathname: string } & PageViewProps
-  >({
-    pathname: '',
+  const [timestamp, setTimestamp] = useState<number>(0);
+  const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
     Auth0Id,
     category,
     name,
@@ -49,25 +47,26 @@ const usePageView = ({
   });
 
   useEffect(() => {
-    console.log({ pathname: router.pathname });
+    const now = Date.now() / 1000;
+
     const sameProps = !isEqualShallow(
-      { pathname: router.asPath, Auth0Id, category, name, properties },
+      { Auth0Id, category, name, properties },
       pageViewProps,
     );
 
-    console.log({ sameProps }, { imestamp: Date.now() });
+    console.log({ sameProps }, { elapsed: now - timestamp });
     //if (Auth0Id && category && name && router.pathname) {
-    if (!sameProps) {
+    if (!sameProps || now - timestamp > 15) {
       console.log({ Auth0Id, category, name, properties });
 
       setPageViewProps({
-        pathname: router.asPath,
         Auth0Id,
         category,
         name,
         properties,
       });
       analytics.pageview({ Auth0Id, category, name, properties });
+      setTimestamp(now);
     }
     //}
   }, [Auth0Id, category, name, properties, pageViewProps, analytics]);

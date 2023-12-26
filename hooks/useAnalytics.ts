@@ -13,16 +13,6 @@ function isEqualShallow(a: any, b: any) {
       return false;
     }
   }
-  for (var key in a.properties) {
-    if (!(key in b.properties) || a.properties[key] !== b.properties[key]) {
-      return false;
-    }
-  }
-  for (var key in b.properties) {
-    if (!(key in a.properties) || a.properties[key] !== b.propeties[key]) {
-      return false;
-    }
-  }
 
   return true;
 }
@@ -56,7 +46,7 @@ const usePageView = ({
 
     console.log({ sameProps }, { elapsed: now - timestamp });
     //if (Auth0Id && category && name && router.pathname) {
-    if (!sameProps || now - timestamp > 15) {
+    if (!sameProps || now - timestamp > 5) {
       console.log({ Auth0Id, category, name, properties });
 
       setPageViewProps({

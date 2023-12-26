@@ -1,5 +1,5 @@
 import { NextRouter } from 'next/router';
-import Analytics, { type PageViewProps } from '@/lib/analytics';
+import Analytics, { type PageViewProps } from '../lib/analytics';
 import { useEffect, useState } from 'react';
 
 function isEqualShallow(a:any, b:any) {

@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.usePageView = exports.useAnalytics = void 0;
 const analytics_node_1 = require("@segment/analytics-node");
 const analytics_1 = __importStar(require("../lib/analytics"));
 const react_1 = require("react");
@@ -55,6 +56,7 @@ const useAnalytics = ({ Auth0Id, type = 'track', event, properties, }) => {
         },
     };
 };
+exports.useAnalytics = useAnalytics;
 const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     const analytics = (0, analytics_1.default)({ router });
     const [timestamp, setTimestamp] = (0, react_1.useState)(0);
@@ -83,5 +85,6 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
         //}
     }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
 };
-exports.default = { useAnalytics, usePageView };
+exports.usePageView = usePageView;
+exports.default = { useAnalytics: exports.useAnalytics, usePageView: exports.usePageView };
 //# sourceMappingURL=useAnalytics.js.map

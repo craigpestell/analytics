@@ -15,7 +15,7 @@ function isEqualShallow(a: any, b: any) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-const useAnalytics = ({
+export const useAnalytics = ({
   Auth0Id,
   type = 'track',
   event,
@@ -75,7 +75,7 @@ const useAnalytics = ({
 export interface UsePageViewProps extends PageViewProps {
   router?: NextRouter;
 }
-const usePageView = ({
+export const usePageView = ({
   router,
   Auth0Id,
   category,

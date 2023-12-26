@@ -46,7 +46,8 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
             ((paramsResolved && !sameProps) || pageViewTimeThresholdMet)) {
             console.log({
                 pageViewTimeThresholdMet,
-                timeElapsed: now - timestamp,
+                now,
+                timestamp,
                 router,
                 //elapsed: now - timestamp,
                 paramsResolved,

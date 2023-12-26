@@ -83,7 +83,8 @@ export const usePageView = ({
     ) {
       console.log({
         pageViewTimeThresholdMet,
-        timeElapsed: now - timestamp,
+        now,
+        timestamp,
         router,
         //elapsed: now - timestamp,
         paramsResolved,

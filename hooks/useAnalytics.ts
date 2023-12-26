@@ -72,6 +72,7 @@ export const usePageView = ({
       pageViewProps,
     );
 
+    console.log({router})
     console.log({ sameProps }, { elapsed: now - timestamp });
     //if (Auth0Id && category && name && router.pathname) {
     if (!sameProps || (now - timestamp > 15)) {

@@ -76,7 +76,7 @@ export const usePageView = ({
         ? true
         : !!router.query.id;
 
-    if (paramsResolved && !sameProps) {
+    if (Auth0Id && paramsResolved && !sameProps) {
       console.log({
         router,
         //elapsed: now - timestamp,

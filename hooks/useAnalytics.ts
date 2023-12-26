@@ -96,8 +96,8 @@ export const usePageView = ({
       });
 
       analytics.pageview({ Auth0Id, category, name, properties });
-      setTimestamp(now);
     }
+    setTimestamp(now);
     //}
   }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
 };

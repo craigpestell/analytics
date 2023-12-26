@@ -59,7 +59,15 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
                 setTimestamp(now);
             }
         }
-    }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
+    }, [
+        Auth0Id,
+        category,
+        name,
+        properties,
+        pageViewProps,
+        analytics,
+        timestamp,
+    ]);
 };
 exports.usePageView = usePageView;
 exports.default = { useAnalytics: exports.useAnalytics, usePageView: exports.usePageView };

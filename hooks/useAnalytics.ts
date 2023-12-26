@@ -95,7 +95,15 @@ export const usePageView = ({
         setTimestamp(now);
       }
     }
-  }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
+  }, [
+    Auth0Id,
+    category,
+    name,
+    properties,
+    pageViewProps,
+    analytics,
+    timestamp,
+  ]);
 };
 
 export default { useAnalytics, usePageView };

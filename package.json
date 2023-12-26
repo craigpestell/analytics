@@ -1,6 +1,6 @@
 {
   "name": "analytics",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "analytics library",
   "keywords": [
     "analytics",
@@ -19,7 +19,7 @@
   },
   "license": "ISC",
   "author": "Craig Pestell",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && npx tsc",
     "prettier": "prettier --write --ignore-unknown .",

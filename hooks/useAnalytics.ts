@@ -65,11 +65,6 @@ export const usePageView = ({
   useEffect(() => {
     const now = Math.round(Date.now() / 1000);
 
-    console.log({ timestamp, now, elapsed: now - timestamp });
-  }, [timestamp]);
-  useEffect(() => {
-    const now = Math.round(Date.now() / 1000);
-
     const sameProps = isEqualShallow(
       { Auth0Id, category, name, properties },
       pageViewProps,
@@ -82,17 +77,9 @@ export const usePageView = ({
         : !!router.query.id;
 
     const pageViewTimeThresholdMet = now - timestamp > 30;
+    console.log({ timestamp });
     //console.log({ pageViewTimeThresholdMet, now, timestamp });
     if (pageViewTimeThresholdMet && Auth0Id && paramsResolved && !sameProps) {
-      console.log({
-        router,
-        sameProps,
-        Auth0Id,
-        category,
-        name,
-        properties,
-        pageViewProps,
-      });
       setPageViewProps({
         Auth0Id,
         category,
@@ -104,6 +91,7 @@ export const usePageView = ({
     }
     if (pageViewTimeThresholdMet && Auth0Id && paramsResolved && !sameProps) {
       if (pageViewTimeThresholdMet) {
+        console.log({ now });
         setTimestamp(now);
       }
     }

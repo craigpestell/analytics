@@ -6,11 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.usePageView = exports.useAnalytics = void 0;
 const analytics_1 = __importDefault(require("../lib/analytics"));
 const react_1 = require("react");
-function isEqualShallow(a, b) {
-    console.log(JSON.stringify(a));
-    console.log(JSON.stringify(b));
-    return JSON.stringify(a) === JSON.stringify(b);
-}
 const useAnalytics = ({ Auth0Id }) => {
     // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
     const analytics = (0, analytics_1.default)();
@@ -28,6 +23,11 @@ const useAnalytics = ({ Auth0Id }) => {
 };
 exports.useAnalytics = useAnalytics;
 const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
+    function isEqualShallow(a, b) {
+        console.log(JSON.stringify(a));
+        console.log(JSON.stringify(b));
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
     const analytics = (0, analytics_1.default)({ router });
     const [timestamp, setTimestamp] = (0, react_1.useState)(0);
     const [pageViewProps, setPageViewProps] = (0, react_1.useState)({
@@ -41,9 +41,9 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
         const sameProps = isEqualShallow({ Auth0Id, category, name, properties }, pageViewProps);
         console.log({ router });
         console.log({ sameProps }, { elapsed: now - timestamp });
-        //if (Auth0Id && category && name && router.pathname) {
-        if (!sameProps || (now - timestamp > 15)) {
-            // console.log({ Auth0Id, category, name, properties });
+        const paramsResolved = (((router === null || router === void 0 ? void 0 : router.pathname.includes("[id]")) || (router === null || router === void 0 ? void 0 : router.pathname.includes("[...id]")) && router.query.id)) || true;
+        console.log({ paramsResolved, sameProps, timeElapsed: (now - timestamp > 15) });
+        if (paramsResolved && !sameProps || (now - timestamp > 15)) {
             setPageViewProps({
                 Auth0Id,
                 category,

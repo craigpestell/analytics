@@ -12,11 +12,6 @@ import Analytics, {
 } from '../lib/analytics';
 import { useEffect, useState } from 'react';
 
-function isEqualShallow(a: any, b: any) {
-  console.log(JSON.stringify(a));
-  console.log(JSON.stringify(b));
-  return JSON.stringify(a) === JSON.stringify(b);
-}
 
 export const useAnalytics = ({ Auth0Id }: { Auth0Id?: string }) => {
   // const analytics = new SegmentAnalytics({ writeKey: SEGMENT_WRITE_KEY });
@@ -55,6 +50,12 @@ export const usePageView = ({
   name,
   properties,
 }: UsePageViewProps) => {
+  function isEqualShallow(a: any, b: any) {
+    console.log(JSON.stringify(a));
+    console.log(JSON.stringify(b));
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+  
   const analytics = Analytics({ router });
   const [timestamp, setTimestamp] = useState<number>(0);
   const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
@@ -74,9 +75,11 @@ export const usePageView = ({
 
     console.log({router})
     console.log({ sameProps }, { elapsed: now - timestamp });
-    //if (Auth0Id && category && name && router.pathname) {
-    if (!sameProps || (now - timestamp > 15)) {
-      // console.log({ Auth0Id, category, name, properties });
+
+    const paramsResolved = ((router?.pathname.includes("[id]") || router?.pathname.includes("[...id]") && router.query.id)) || true;
+
+    console.log({paramsResolved, sameProps, timeElapsed:(now - timestamp > 15)})
+    if (paramsResolved && !sameProps || (now - timestamp > 15)) {
 
       setPageViewProps({
         Auth0Id,

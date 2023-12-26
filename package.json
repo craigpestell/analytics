@@ -1,0 +1,42 @@
+{
+  "name": "analytics",
+  "version": "0.0.1",
+  "description": "analytics library",
+  "keywords": [
+    "analytics",
+    "typescript",
+    "nextjs",
+    "node",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/Tap-AI/analytics#readme",
+  "bugs": {
+    "url": "https://github.com/Tap-AI/analytics/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tap-AI/analytics.git"
+  },
+  "license": "ISC",
+  "author": "Craig Pestell",
+  "main": "dist/index.ts",
+  "scripts": {
+    "build":"npx tsc",
+    "prettier": "prettier --write --ignore-unknown .",
+    "prettier:check": "prettier --check --ignore-unknown .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ts-lint": "tsc --noEmit --incremental --watch"
+  },
+  "dependencies": {
+    "@segment/analytics-node": "^1.1.4",
+    "@types/node": "^20.10.5",
+    "next": "^13.5.5",
+    "react": "^18.2.0",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@vercel/style-guide": "^5.0.1",
+    "prettier": "^3.0.3"
+  }
+}

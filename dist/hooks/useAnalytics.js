@@ -45,6 +45,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
         console.log({ timestamp });
         //console.log({ pageViewTimeThresholdMet, now, timestamp });
         if (Auth0Id && paramsResolved && (!sameProps || pageViewTimeThresholdMet)) {
+            setTimestamp(now);
             setPageViewProps({
                 Auth0Id,
                 category,
@@ -52,12 +53,6 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
                 properties,
             });
             analytics.pageview({ Auth0Id, category, name, properties });
-        }
-        if (pageViewTimeThresholdMet && Auth0Id && paramsResolved && !sameProps) {
-            if (pageViewTimeThresholdMet) {
-                console.log({ now });
-                setTimestamp(now);
-            }
         }
     }, [
         Auth0Id,

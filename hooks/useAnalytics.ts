@@ -54,8 +54,8 @@ const usePageView = ({
       { pathname: router.asPath, Auth0Id, category, name, properties },
       pageViewProps,
     );
-    
-    console.log({ sameProps }, {imestamp: Date.now()});
+
+    console.log({ sameProps }, { imestamp: Date.now() });
     //if (Auth0Id && category && name && router.pathname) {
     if (!sameProps) {
       console.log({ Auth0Id, category, name, properties });

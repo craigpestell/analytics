@@ -21,21 +21,20 @@ const Analytics = ({ router }) => {
                 }
               }
               */
-            if (router.pathname && Auth0Id) {
-                analytics.page({
-                    userId: Auth0Id,
-                    category,
-                    name,
-                    properties: Object.assign(Object.assign({}, properties), { url: router.pathname }),
-                });
-            }
+            const pageParams = {
+                userId: Auth0Id,
+                category,
+                name,
+                properties: Object.assign({}, properties),
+            };
+            analytics.page(pageParams);
         },
         track: ({ Auth0Id, type = 'track', event, properties, }) => {
             const e = {
                 userId: Auth0Id,
                 type,
                 event,
-                properties: Object.assign(Object.assign({}, properties), { url: router.pathname }),
+                properties: Object.assign({}, properties),
             };
             console.log('track: ', e);
             analytics.track(e);

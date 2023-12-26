@@ -1,5 +1,8 @@
 import { NextRouter } from 'next/router';
-import { PageParams, Analytics as SegmentAnalytics } from '@segment/analytics-node';
+import {
+  PageParams,
+  Analytics as SegmentAnalytics,
+} from '@segment/analytics-node';
 
 const SEGMENT_WRITE_KEY =
   process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
@@ -35,7 +38,7 @@ const Analytics = ({ router }: { router?: NextRouter }) => {
           }
         }
         */
-      const pageParams:PageParams = {
+      const pageParams: PageParams = {
         userId: Auth0Id,
         category,
         name,
@@ -68,7 +71,6 @@ const Analytics = ({ router }: { router?: NextRouter }) => {
         event,
         properties: {
           ...properties,
-          url: router.pathname,
         },
       };
       console.log('track: ', e);

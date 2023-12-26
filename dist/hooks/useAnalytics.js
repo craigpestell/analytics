@@ -40,7 +40,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
     (0, react_1.useEffect)(() => {
         console.log({ pathname: router.pathname });
         const sameProps = !isEqualShallow({ pathname: router.asPath, Auth0Id, category, name, properties }, pageViewProps);
-        console.log({ sameProps });
+        console.log({ sameProps }, { imestamp: Date.now() });
         //if (Auth0Id && category && name && router.pathname) {
         if (!sameProps) {
             console.log({ Auth0Id, category, name, properties });
@@ -54,7 +54,7 @@ const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
             analytics.pageview({ Auth0Id, category, name, properties });
         }
         //}
-    }, [Auth0Id, category, name, properties, pageViewProps, analytics, router]);
+    }, [Auth0Id, category, name, properties, pageViewProps, analytics]);
 };
 exports.default = usePageView;
 //# sourceMappingURL=useAnalytics.js.map

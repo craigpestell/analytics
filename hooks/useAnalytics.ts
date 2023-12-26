@@ -81,11 +81,10 @@ export const usePageView = ({
         ? true
         : !!router.query.id;
 
-    if ((paramsResolved && !sameProps) || now - timestamp > 15) {
+    if ((paramsResolved && !sameProps)) {
       console.log({
         paramsResolved,
         sameProps,
-        timeElapsed: now - timestamp > 15,
       });
       setPageViewProps({
         Auth0Id,

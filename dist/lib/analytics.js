@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const analytics_node_1 = require("@segment/analytics-node");
 const Analytics = (writeKey, { router } = {}) => {
-    console.log({ router });
+    console.log({ writeKey });
     const analytics = new analytics_node_1.Analytics({
         writeKey,
     }).on('error', console.error);

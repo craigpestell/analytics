@@ -27,7 +27,7 @@ const Analytics = (
   writeKey: string,
   { router }: { router?: NextRouter } = {},
 ) => {
-  console.log({ router });
+  console.log({ writeKey });
   const analytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);

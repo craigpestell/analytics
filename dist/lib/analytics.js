@@ -7,6 +7,26 @@ const Analytics = (writeKey) => {
         writeKey,
     }).on('error', console.error);
     const methods = {
+        identify: ({ userId, anonymousId, traits, context, timestamp, integrations, }) => {
+            if (userId) {
+                analytics.identify({
+                    userId,
+                    traits,
+                    context,
+                    timestamp,
+                    integrations,
+                });
+            }
+            if (anonymousId) {
+                analytics.identify({
+                    anonymousId,
+                    traits,
+                    context,
+                    timestamp,
+                    integrations,
+                });
+            }
+        },
         pageview: ({ Auth0Id, category, name, properties }) => {
             /*
               {
@@ -42,6 +62,21 @@ const Analytics = (writeKey) => {
         },
     };
     const sendMessage = {
+        identify: (chromeRuntime, { userId, anonymousId, traits, context, timestamp, integrations, }) => {
+            chromeRuntime.sendMessage({
+                analytics: {
+                    action: 'identify',
+                    userId,
+                    anonymousId,
+                    traits,
+                    context,
+                    timestamp,
+                    integrations,
+                },
+            }, (response) => {
+                console.log({ response });
+            });
+        },
         pageview: (chromeRuntime, { Auth0Id, category, name, properties }) => {
             chromeRuntime.sendMessage({
                 analytics: {

@@ -29,6 +29,33 @@ const Analytics = (writeKey: string) => {
   }).on('error', console.error);
 
   const methods = {
+    identify: ({
+      userId,
+      anonymousId,
+      traits,
+      context,
+      timestamp,
+      integrations,
+    }: IdentifyParams) => {
+      if (userId) {
+        analytics.identify({
+          userId,
+          traits,
+          context,
+          timestamp,
+          integrations,
+        });
+      }
+      if (anonymousId) {
+        analytics.identify({
+          anonymousId,
+          traits,
+          context,
+          timestamp,
+          integrations,
+        });
+      }
+    },
     pageview: ({ Auth0Id, category, name, properties }: PageViewProps) => {
       /*
         {
@@ -90,6 +117,34 @@ const Analytics = (writeKey: string) => {
     ): void;
   };
   const sendMessage = {
+    identify: (
+      chromeRuntime: ChromeRuntime,
+      {
+        userId,
+        anonymousId,
+        traits,
+        context,
+        timestamp,
+        integrations,
+      }: IdentifyParams,
+    ) => {
+      chromeRuntime.sendMessage(
+        {
+          analytics: {
+            action: 'identify',
+            userId,
+            anonymousId,
+            traits,
+            context,
+            timestamp,
+            integrations,
+          },
+        },
+        (response: any) => {
+          console.log({ response });
+        },
+      );
+    },
     pageview: (
       chromeRuntime: ChromeRuntime,
       { Auth0Id, category, name, properties }: PageViewProps,

@@ -1,4 +1,3 @@
-import { NextRouter } from 'next/router';
 import {
   IdentifyParams,
   PageParams,

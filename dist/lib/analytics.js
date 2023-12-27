@@ -6,7 +6,7 @@ const Analytics = (writeKey) => {
     const analytics = new analytics_node_1.Analytics({
         writeKey,
     }).on('error', console.error);
-    return {
+    const methods = {
         pageview: ({ Auth0Id, category, name, properties }) => {
             /*
               {
@@ -41,6 +41,34 @@ const Analytics = (writeKey) => {
             analytics.track(trackParams);
         },
     };
+    const sendMessage = {
+        pageview: (chromeRuntime, { Auth0Id, category, name, properties }) => {
+            chromeRuntime.sendMessage({
+                analytics: {
+                    action: 'pageview',
+                    Auth0Id,
+                    category,
+                    name,
+                    properties,
+                },
+            }, (response) => {
+                console.log({ response });
+            });
+        },
+        track: (chromeRuntime, { userId: Auth0Id, event, properties }) => {
+            chromeRuntime.sendMessage({
+                analytics: {
+                    action: 'track',
+                    Auth0Id,
+                    event,
+                    properties,
+                },
+            }, (response) => {
+                console.log({ response });
+            });
+        },
+    };
+    return Object.assign(Object.assign({}, methods), { sendMessage });
 };
 exports.default = Analytics;
 //# sourceMappingURL=analytics.js.map

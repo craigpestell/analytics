@@ -28,7 +28,7 @@ const Analytics = (writeKey: string) => {
     writeKey,
   }).on('error', console.error);
 
-  return {
+  const methods = {
     pageview: ({ Auth0Id, category, name, properties }: PageViewProps) => {
       /*
         {
@@ -82,5 +82,53 @@ const Analytics = (writeKey: string) => {
       analytics.track(trackParams);
     },
   };
+
+  type ChromeRuntime = {
+    sendMessage<M = any, R = any>(
+      message: M,
+      responseCallback: (response: R) => void,
+    ): void;
+  };
+  const sendMessage = {
+    pageview: (
+      chromeRuntime: ChromeRuntime,
+      { Auth0Id, category, name, properties }: PageViewProps,
+    ) => {
+      chromeRuntime.sendMessage(
+        {
+          analytics: {
+            action: 'pageview',
+            Auth0Id,
+            category,
+            name,
+            properties,
+          },
+        },
+        (response: any) => {
+          console.log({ response });
+        },
+      );
+    },
+    track: (
+      chromeRuntime: ChromeRuntime,
+      { userId: Auth0Id, event, properties }: TrackParams,
+    ) => {
+      chromeRuntime.sendMessage(
+        {
+          analytics: {
+            action: 'track',
+            Auth0Id,
+            event,
+            properties,
+          },
+        },
+        (response: any) => {
+          console.log({ response });
+        },
+      );
+    },
+  };
+
+  return { ...methods, sendMessage };
 };
 export default Analytics;

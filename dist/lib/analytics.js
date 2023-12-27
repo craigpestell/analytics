@@ -4,6 +4,7 @@ exports.SEGMENT_WRITE_KEY = void 0;
 const analytics_node_1 = require("@segment/analytics-node");
 exports.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
 const Analytics = ({ router } = {}) => {
+    console.log({ router });
     const analytics = new analytics_node_1.Analytics({
         writeKey: `${exports.SEGMENT_WRITE_KEY}`,
     }).on('error', console.error);

@@ -27,6 +27,7 @@ export type PageViewProps = {
 };
 
 const Analytics = ({ router }: { router?: NextRouter } = {}) => {
+  console.log({ router });
   const analytics = new SegmentAnalytics({
     writeKey: `${SEGMENT_WRITE_KEY}`,
   }).on('error', console.error);

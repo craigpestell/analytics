@@ -36,7 +36,7 @@ const Analytics = (writeKey) => {
             const identifyParams = Auth0Id
                 ? { userId: Auth0Id }
                 : { anonymousId: 'anonymous' };
-            const trackParams = Object.assign({ event, properties: Object.assign({}, properties) }, identifyParams);
+            const trackParams = Object.assign({ event: event !== null && event !== void 0 ? event : 'no event specified', properties: Object.assign({}, properties) }, identifyParams);
             console.log('track: ', trackParams);
             analytics.track(trackParams);
         },
@@ -56,6 +56,7 @@ const Analytics = (writeKey) => {
             });
         },
         track: (chromeRuntime, { Auth0Id, event, properties, }) => {
+            console.log({ Auth0Id, event, properties });
             chromeRuntime.sendMessage({
                 analytics: {
                     action: 'track',

@@ -71,7 +71,7 @@ const Analytics = (writeKey: string) => {
         : { anonymousId: 'anonymous' };
 
       const trackParams: TrackParams = {
-        event,
+        event: event ?? 'no event specified',
         properties: {
           ...properties,
         },
@@ -117,6 +117,7 @@ const Analytics = (writeKey: string) => {
         properties,
       }: { Auth0Id: string; event: string; properties?: Object },
     ) => {
+      console.log({ Auth0Id, event, properties });
       chromeRuntime.sendMessage(
         {
           analytics: {

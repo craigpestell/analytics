@@ -67,7 +67,7 @@ export const usePageView = ({
   });*/
 
   useEffect(() => {
-    const now = Math.round(Date.now() / 1000);
+    //const now = Math.round(Date.now() / 1000);
     const timer = setTimeout(() => {
       setTimerThreshold(true);
       /*setPageViewProps({

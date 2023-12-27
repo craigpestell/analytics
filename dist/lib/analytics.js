@@ -32,7 +32,9 @@ const Analytics = ({ router } = {}) => {
             console.log('page:', pageParams);
             analytics.page(pageParams);
         },
-        track: ({ Auth0Id, type = 'track', event, properties, }) => {
+        track: ({ Auth0Id, 
+        //type = 'track',
+        event, properties, }) => {
             const identifyParams = Auth0Id
                 ? { userId: Auth0Id }
                 : { anonymousId: 'anonymous' };

@@ -61,7 +61,7 @@ const Analytics = ({ router }: { router?: NextRouter } = {}) => {
     },
     track: ({
       Auth0Id,
-      type = 'track',
+      //type = 'track',
       event,
       properties,
     }: {

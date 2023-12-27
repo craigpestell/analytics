@@ -29,7 +29,7 @@ const Analytics = (writeKey: string) => {
   }).on('error', console.error);
 
   const methods = {
-    identify: ({
+    identify: async ({
       userId,
       anonymousId,
       traits,
@@ -38,25 +38,38 @@ const Analytics = (writeKey: string) => {
       integrations,
     }: IdentifyParams) => {
       if (userId) {
-        analytics.identify({
-          userId,
-          traits,
-          context,
-          timestamp,
-          integrations,
-        });
+        await new Promise((resolve) =>
+          resolve(
+            analytics.identify({
+              userId,
+              traits,
+              context,
+              timestamp,
+              integrations,
+            }),
+          ),
+        );
       }
       if (anonymousId) {
-        analytics.identify({
-          anonymousId,
-          traits,
-          context,
-          timestamp,
-          integrations,
-        });
+        await new Promise((resolve) =>
+          resolve(
+            analytics.identify({
+              anonymousId,
+              traits,
+              context,
+              timestamp,
+              integrations,
+            }),
+          ),
+        );
       }
     },
-    pageview: ({ Auth0Id, category, name, properties }: PageViewProps) => {
+    pageview: async ({
+      Auth0Id,
+      category,
+      name,
+      properties,
+    }: PageViewProps) => {
       /*
         {
           userId: '019mr8mf4r',
@@ -80,9 +93,9 @@ const Analytics = (writeKey: string) => {
       };
 
       console.log('page:', pageParams);
-      analytics.page(pageParams);
+      await new Promise((resolve) => resolve(analytics.page(pageParams)));
     },
-    track: ({
+    track: async ({
       Auth0Id,
       //type = 'track',
       event,
@@ -106,7 +119,7 @@ const Analytics = (writeKey: string) => {
       };
 
       console.log('track: ', trackParams);
-      analytics.track(trackParams);
+      await new Promise((resolve) => resolve(analytics.track(trackParams)));
     },
   };
 

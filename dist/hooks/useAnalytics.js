@@ -29,39 +29,39 @@ const useAnalytics = ({ Auth0Id }) => {
 };
 exports.useAnalytics = useAnalytics;
 const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
-    function isEqualShallow(a, b) {
-        return JSON.stringify(a) === JSON.stringify(b);
-    }
-    const now = Math.round(Date.now() / 1000);
+    /*function isEqualShallow(a: any, b: any) {
+      return JSON.stringify(a) === JSON.stringify(b);
+    }*/
+    //const now = Math.round(Date.now() / 1000);
     const analytics = (0, analytics_1.default)({ router });
-    const [timestamp, setTimestamp] = (0, react_1.useState)(now);
+    //const [timestamp, setTimestamp] = useState<number>(now);
     const [timerThreshold, setTimerThreshold] = (0, react_1.useState)(false);
-    const [pageViewProps, setPageViewProps] = (0, react_1.useState)({
-        Auth0Id,
-        category,
-        name,
-        properties,
-    });
+    /*const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
+      Auth0Id,
+      category,
+      name,
+      properties,
+    });*/
     (0, react_1.useEffect)(() => {
         const now = Math.round(Date.now() / 1000);
         const timer = setTimeout(() => {
             setTimerThreshold(true);
-            setPageViewProps({
-                Auth0Id,
-                category,
-                name,
-                properties,
-            });
+            /*setPageViewProps({
+              Auth0Id,
+              category,
+              name,
+              properties,
+            });*/
             clearTimeout(timer);
         }, 5000);
-        setTimestamp(now);
+        //setTimestamp(now);
         if (timerThreshold) {
-            setPageViewProps({
-                Auth0Id,
-                category,
-                name,
-                properties,
-            });
+            /*setPageViewProps({
+              Auth0Id,
+              category,
+              name,
+              properties,
+            });*/
             analytics.pageview({ Auth0Id, category, name, properties });
             //setTimerThreshold(false);
         }

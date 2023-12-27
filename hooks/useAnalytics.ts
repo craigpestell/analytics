@@ -49,44 +49,44 @@ export const usePageView = ({
   name,
   properties,
 }: UsePageViewProps) => {
-  function isEqualShallow(a: any, b: any) {
+  /*function isEqualShallow(a: any, b: any) {
     return JSON.stringify(a) === JSON.stringify(b);
-  }
-  const now = Math.round(Date.now() / 1000);
+  }*/
+  //const now = Math.round(Date.now() / 1000);
 
   const analytics = Analytics({ router });
-  const [timestamp, setTimestamp] = useState<number>(now);
+  //const [timestamp, setTimestamp] = useState<number>(now);
 
   const [timerThreshold, setTimerThreshold] = useState<boolean>(false);
 
-  const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
+  /*const [pageViewProps, setPageViewProps] = useState<PageViewProps>({
     Auth0Id,
     category,
     name,
     properties,
-  });
+  });*/
 
   useEffect(() => {
     const now = Math.round(Date.now() / 1000);
     const timer = setTimeout(() => {
       setTimerThreshold(true);
-      setPageViewProps({
+      /*setPageViewProps({
         Auth0Id,
         category,
         name,
         properties,
-      });
+      });*/
       clearTimeout(timer);
     }, 5000);
 
-    setTimestamp(now);
+    //setTimestamp(now);
     if (timerThreshold) {
-      setPageViewProps({
+      /*setPageViewProps({
         Auth0Id,
         category,
         name,
         properties,
-      });
+      });*/
 
       analytics.pageview({ Auth0Id, category, name, properties });
       //setTimerThreshold(false);

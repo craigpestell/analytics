@@ -23,7 +23,7 @@ export type PageViewProps = {
 };
 
 const Analytics = (writeKey: string) => {
-  console.log({ writeKey });
+  console.log('instantiate analytics:', { writeKey });
   const analytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);
@@ -109,7 +109,7 @@ const Analytics = (writeKey: string) => {
       properties?: Object;
     }) => {
       const identifyParams: IdentifyParams = Auth0Id
-        ? { userId: Auth0Id as string }
+        ? { userId: Auth0Id }
         : { anonymousId: 'anonymous' };
 
       const trackParams: TrackParams = {

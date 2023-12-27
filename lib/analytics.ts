@@ -111,7 +111,11 @@ const Analytics = (writeKey: string) => {
     },
     track: (
       chromeRuntime: ChromeRuntime,
-      { userId: Auth0Id, event, properties }: TrackParams,
+      {
+        Auth0Id,
+        event,
+        properties,
+      }: { Auth0Id: string; event: string; properties?: Object },
     ) => {
       chromeRuntime.sendMessage(
         {

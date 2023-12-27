@@ -55,7 +55,7 @@ const Analytics = (writeKey) => {
                 console.log({ response });
             });
         },
-        track: (chromeRuntime, { userId: Auth0Id, event, properties }) => {
+        track: (chromeRuntime, { Auth0Id, event, properties, }) => {
             chromeRuntime.sendMessage({
                 analytics: {
                     action: 'track',

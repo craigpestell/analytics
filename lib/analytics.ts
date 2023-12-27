@@ -119,94 +119,10 @@ const Analytics = (writeKey: string) => {
         ...identifyParams,
       };
 
-      console.log('track: ', trackParams);
-      const result = await new Promise((resolve) =>
-        resolve(analytics.track(trackParams)),
-      );
-      console.log({ result });
-      return result;
+      await new Promise((resolve) => resolve(analytics.track(trackParams)));
     },
   };
 
-  type ChromeRuntime = {
-    sendMessage<M = any, R = any>(
-      message: M,
-      responseCallback: (response: R) => void,
-    ): void;
-  };
-  const sendMessage = {
-    identify: (
-      chromeRuntime: ChromeRuntime,
-      {
-        userId,
-        anonymousId,
-        traits,
-        context,
-        timestamp,
-        integrations,
-      }: IdentifyParams,
-    ) => {
-      chromeRuntime.sendMessage(
-        {
-          analytics: {
-            action: 'identify',
-            userId,
-            anonymousId,
-            traits,
-            context,
-            timestamp,
-            integrations,
-          },
-        },
-        (response: any) => {
-          console.log({ response });
-        },
-      );
-    },
-    pageview: (
-      chromeRuntime: ChromeRuntime,
-      { Auth0Id, category, name, properties }: PageViewProps,
-    ) => {
-      chromeRuntime.sendMessage(
-        {
-          analytics: {
-            action: 'pageview',
-            Auth0Id,
-            category,
-            name,
-            properties,
-          },
-        },
-        (response: any) => {
-          console.log({ response });
-        },
-      );
-    },
-    track: (
-      chromeRuntime: ChromeRuntime,
-      {
-        Auth0Id,
-        event,
-        properties,
-      }: { Auth0Id: string; event: string; properties?: Object },
-    ) => {
-      console.log({ Auth0Id, event, properties });
-      chromeRuntime.sendMessage(
-        {
-          analytics: {
-            action: 'track',
-            Auth0Id,
-            event,
-            properties,
-          },
-        },
-        (response: any) => {
-          console.log({ response });
-        },
-      );
-    },
-  };
-
-  return { ...methods, sendMessage };
+  return { ...methods };
 };
 export default Analytics;

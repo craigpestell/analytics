@@ -65,56 +65,10 @@ const Analytics = (writeKey) => {
                 ? { userId: Auth0Id }
                 : { anonymousId: 'anonymous' };
             const trackParams = Object.assign({ event: event !== null && event !== void 0 ? event : 'no event specified', properties: Object.assign({}, properties) }, identifyParams);
-            console.log('track: ', trackParams);
-            const result = yield new Promise((resolve) => resolve(analytics.track(trackParams)));
-            console.log({ result });
-            return result;
+            yield new Promise((resolve) => resolve(analytics.track(trackParams)));
         }),
     };
-    const sendMessage = {
-        identify: (chromeRuntime, { userId, anonymousId, traits, context, timestamp, integrations, }) => {
-            chromeRuntime.sendMessage({
-                analytics: {
-                    action: 'identify',
-                    userId,
-                    anonymousId,
-                    traits,
-                    context,
-                    timestamp,
-                    integrations,
-                },
-            }, (response) => {
-                console.log({ response });
-            });
-        },
-        pageview: (chromeRuntime, { Auth0Id, category, name, properties }) => {
-            chromeRuntime.sendMessage({
-                analytics: {
-                    action: 'pageview',
-                    Auth0Id,
-                    category,
-                    name,
-                    properties,
-                },
-            }, (response) => {
-                console.log({ response });
-            });
-        },
-        track: (chromeRuntime, { Auth0Id, event, properties, }) => {
-            console.log({ Auth0Id, event, properties });
-            chromeRuntime.sendMessage({
-                analytics: {
-                    action: 'track',
-                    Auth0Id,
-                    event,
-                    properties,
-                },
-            }, (response) => {
-                console.log({ response });
-            });
-        },
-    };
-    return Object.assign(Object.assign({}, methods), { sendMessage });
+    return Object.assign({}, methods);
 };
 exports.default = Analytics;
 //# sourceMappingURL=analytics.js.map

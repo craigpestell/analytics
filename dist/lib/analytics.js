@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SEGMENT_WRITE_KEY = void 0;
+require("dotenv/config");
 const analytics_node_1 = require("@segment/analytics-node");
-exports.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
+exports.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY;
 console.log({ SEGMENT_WRITE_KEY: exports.SEGMENT_WRITE_KEY });
 const Analytics = ({ router } = {}) => {
     console.log({ router });

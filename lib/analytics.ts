@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { NextRouter } from 'next/router';
 import {
   IdentifyParams,
@@ -6,8 +8,7 @@ import {
   TrackParams,
 } from '@segment/analytics-node';
 
-export const SEGMENT_WRITE_KEY =
-  process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
+export const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY;
 console.log({ SEGMENT_WRITE_KEY });
 //const analytics = AnalyticsBrowser.load({ writeKey: process.env.WRITE_KEY as string })
 

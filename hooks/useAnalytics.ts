@@ -1,13 +1,13 @@
 import { NextRouter } from 'next/router';
-import {
+/*import {
   IdentifyParams,
   Analytics as SegmentAnalytics,
   TrackParams,
 } from '@segment/analytics-node';
-
+*/
 import Analytics, {
   type PageViewProps,
-  SEGMENT_WRITE_KEY,
+  //SEGMENT_WRITE_KEY,
   type EventType,
 } from '../lib/analytics';
 import { useEffect, useState } from 'react';

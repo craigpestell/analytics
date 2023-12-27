@@ -4,6 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usePageView = exports.useAnalytics = void 0;
+/*import {
+  IdentifyParams,
+  Analytics as SegmentAnalytics,
+  TrackParams,
+} from '@segment/analytics-node';
+*/
 const analytics_1 = __importDefault(require("../lib/analytics"));
 const react_1 = require("react");
 const useAnalytics = ({ Auth0Id }) => {

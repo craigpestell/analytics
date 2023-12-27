@@ -23,10 +23,7 @@ export type PageViewProps = {
   properties?: Object;
 };
 
-const Analytics = (
-  writeKey: string,
-  { router }: { router?: NextRouter } = {},
-) => {
+const Analytics = (writeKey: string) => {
   console.log({ writeKey });
   const analytics = new SegmentAnalytics({
     writeKey,

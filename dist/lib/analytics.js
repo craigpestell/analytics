@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const analytics_node_1 = require("@segment/analytics-node");
-const Analytics = (writeKey, { router } = {}) => {
+const Analytics = (writeKey) => {
     console.log({ writeKey });
     const analytics = new analytics_node_1.Analytics({
         writeKey,

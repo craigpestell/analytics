@@ -23,7 +23,6 @@ export type PageViewProps = {
 };
 
 const Analytics = (writeKey: string) => {
-  console.log('instantiate analytics:', { writeKey });
   const analytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);

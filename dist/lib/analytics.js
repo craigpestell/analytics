@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const analytics_node_1 = require("@segment/analytics-node");
 const Analytics = (writeKey) => {
-    console.log('instantiate analytics:', { writeKey });
     const analytics = new analytics_node_1.Analytics({
         writeKey,
     }).on('error', console.error);

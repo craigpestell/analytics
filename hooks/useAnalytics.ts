@@ -44,7 +44,6 @@ const Analytics = (writeKey: string) => {
   };
 
   const usePageView = ({
-    router,
     Auth0Id,
     category,
     name,

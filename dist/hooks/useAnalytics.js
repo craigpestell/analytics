@@ -26,7 +26,7 @@ const Analytics = (writeKey) => {
             },
         };
     };
-    const usePageView = ({ router, Auth0Id, category, name, properties, }) => {
+    const usePageView = ({ Auth0Id, category, name, properties, }) => {
         /*function isEqualShallow(a: any, b: any) {
           return JSON.stringify(a) === JSON.stringify(b);
         }*/

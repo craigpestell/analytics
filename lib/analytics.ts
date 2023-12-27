@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 import { NextRouter } from 'next/router';
 import {
   IdentifyParams,
@@ -8,8 +6,6 @@ import {
   TrackParams,
 } from '@segment/analytics-node';
 
-export const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY;
-console.log({ SEGMENT_WRITE_KEY });
 //const analytics = AnalyticsBrowser.load({ writeKey: process.env.WRITE_KEY as string })
 
 export type EventType =
@@ -27,10 +23,13 @@ export type PageViewProps = {
   properties?: Object;
 };
 
-const Analytics = ({ router }: { router?: NextRouter } = {}) => {
+const Analytics = (
+  writeKey: string,
+  { router }: { router?: NextRouter } = {},
+) => {
   console.log({ router });
   const analytics = new SegmentAnalytics({
-    writeKey: `${SEGMENT_WRITE_KEY}`,
+    writeKey,
   }).on('error', console.error);
 
   return {
@@ -88,34 +87,4 @@ const Analytics = ({ router }: { router?: NextRouter } = {}) => {
     },
   };
 };
-/*
-          messageId?: string
-        type: SegmentEventType
-      
-        // page specific
-        category?: string
-        name?: string
-      
-        properties?: EventProperties
-      
-        traits?: Traits // Traits is only defined in 'identify' and 'group', even if it can be passed in other calls.
-      
-        integrations?: Integrations
-        context?: CoreExtraContext
-        options?: CoreOptions
-      
-        userId?: ID
-        anonymousId?: ID
-        groupId?: ID
-        previousId?: ID
-      
-        event?: string
-      
-        writeKey?: string
-      
-        sentAt?: Date
-      
-        _metadata?: SegmentEventMetadata
-      
-        timestamp?: Timestamp */
 export default Analytics;

@@ -1,14 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SEGMENT_WRITE_KEY = void 0;
-require("dotenv/config");
 const analytics_node_1 = require("@segment/analytics-node");
-exports.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY;
-console.log({ SEGMENT_WRITE_KEY: exports.SEGMENT_WRITE_KEY });
-const Analytics = ({ router } = {}) => {
+const Analytics = (writeKey, { router } = {}) => {
     console.log({ router });
     const analytics = new analytics_node_1.Analytics({
-        writeKey: `${exports.SEGMENT_WRITE_KEY}`,
+        writeKey,
     }).on('error', console.error);
     return {
         pageview: ({ Auth0Id, category, name, properties }) => {
@@ -46,35 +42,5 @@ const Analytics = ({ router } = {}) => {
         },
     };
 };
-/*
-          messageId?: string
-        type: SegmentEventType
-      
-        // page specific
-        category?: string
-        name?: string
-      
-        properties?: EventProperties
-      
-        traits?: Traits // Traits is only defined in 'identify' and 'group', even if it can be passed in other calls.
-      
-        integrations?: Integrations
-        context?: CoreExtraContext
-        options?: CoreOptions
-      
-        userId?: ID
-        anonymousId?: ID
-        groupId?: ID
-        previousId?: ID
-      
-        event?: string
-      
-        writeKey?: string
-      
-        sentAt?: Date
-      
-        _metadata?: SegmentEventMetadata
-      
-        timestamp?: Timestamp */
 exports.default = Analytics;
 //# sourceMappingURL=analytics.js.map

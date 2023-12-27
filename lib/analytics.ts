@@ -8,7 +8,7 @@ import {
 
 export const SEGMENT_WRITE_KEY =
   process.env.SEGMENT_WRITE_KEY || 'FVXjn6W0y5iDR11coKCRC4TBHqcAP97r';
-
+console.log({ SEGMENT_WRITE_KEY });
 //const analytics = AnalyticsBrowser.load({ writeKey: process.env.WRITE_KEY as string })
 
 export type EventType =

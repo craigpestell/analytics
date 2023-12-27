@@ -18,7 +18,7 @@ const Analytics = (writeKey) => {
     const methods = {
         identify: ({ userId, anonymousId, traits, context, timestamp, integrations, }) => __awaiter(void 0, void 0, void 0, function* () {
             if (userId) {
-                yield new Promise((resolve) => resolve(analytics.identify({
+                return yield new Promise((resolve) => resolve(analytics.identify({
                     userId,
                     traits,
                     context,
@@ -27,7 +27,7 @@ const Analytics = (writeKey) => {
                 })));
             }
             if (anonymousId) {
-                yield new Promise((resolve) => resolve(analytics.identify({
+                return yield new Promise((resolve) => resolve(analytics.identify({
                     anonymousId,
                     traits,
                     context,
@@ -57,7 +57,7 @@ const Analytics = (writeKey) => {
                 properties: Object.assign({}, properties),
             };
             console.log('page:', pageParams);
-            yield new Promise((resolve) => resolve(analytics.page(pageParams)));
+            return yield new Promise((resolve) => resolve(analytics.page(pageParams)));
         }),
         track: ({ Auth0Id, 
         //type = 'track',
@@ -67,7 +67,9 @@ const Analytics = (writeKey) => {
                 : { anonymousId: 'anonymous' };
             const trackParams = Object.assign({ event: event !== null && event !== void 0 ? event : 'no event specified', properties: Object.assign({}, properties) }, identifyParams);
             console.log('track: ', trackParams);
-            yield new Promise((resolve) => resolve(analytics.track(trackParams)));
+            const result = yield new Promise((resolve) => resolve(analytics.track(trackParams)));
+            console.log({ result });
+            return result;
         }),
     };
     const sendMessage = {

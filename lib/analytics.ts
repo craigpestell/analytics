@@ -38,7 +38,7 @@ const Analytics = (writeKey: string) => {
       integrations,
     }: IdentifyParams) => {
       if (userId) {
-        await new Promise((resolve) =>
+        return await new Promise((resolve) =>
           resolve(
             analytics.identify({
               userId,
@@ -51,7 +51,7 @@ const Analytics = (writeKey: string) => {
         );
       }
       if (anonymousId) {
-        await new Promise((resolve) =>
+        return await new Promise((resolve) =>
           resolve(
             analytics.identify({
               anonymousId,
@@ -93,7 +93,9 @@ const Analytics = (writeKey: string) => {
       };
 
       console.log('page:', pageParams);
-      await new Promise((resolve) => resolve(analytics.page(pageParams)));
+      return await new Promise((resolve) =>
+        resolve(analytics.page(pageParams)),
+      );
     },
     track: async ({
       Auth0Id,
@@ -119,7 +121,11 @@ const Analytics = (writeKey: string) => {
       };
 
       console.log('track: ', trackParams);
-      await new Promise((resolve) => resolve(analytics.track(trackParams)));
+      const result = await new Promise((resolve) =>
+        resolve(analytics.track(trackParams)),
+      );
+      console.log({ result });
+      return result;
     },
   };
 

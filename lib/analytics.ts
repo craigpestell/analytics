@@ -22,7 +22,7 @@ export type PageViewProps = {
   properties?: Object;
 };
 
-const Analytics = (writeKey: string) => {
+const HealthTapAnalytics = (writeKey: string) => {
   const segmentAnalytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);
@@ -114,4 +114,4 @@ const Analytics = (writeKey: string) => {
     },
   };
 };
-export default Analytics;
+export default HealthTapAnalytics;

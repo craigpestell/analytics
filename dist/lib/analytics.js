@@ -17,22 +17,22 @@ const Analytics = (writeKey) => {
     const methods = {
         identify: ({ userId, anonymousId, traits, context, timestamp, integrations, }) => __awaiter(void 0, void 0, void 0, function* () {
             if (userId) {
-                return yield new Promise((resolve) => resolve(segmentAnalytics.identify({
+                return segmentAnalytics.identify({
                     userId,
                     traits,
                     context,
                     timestamp,
                     integrations,
-                })));
+                });
             }
             if (anonymousId) {
-                return yield new Promise((resolve) => resolve(segmentAnalytics.identify({
+                return segmentAnalytics.identify({
                     anonymousId,
                     traits,
                     context,
                     timestamp,
                     integrations,
-                })));
+                });
             }
         }),
         pageview: ({ Auth0Id, category, name, properties, }) => __awaiter(void 0, void 0, void 0, function* () {
@@ -42,8 +42,7 @@ const Analytics = (writeKey) => {
                 name,
                 properties: Object.assign({}, properties),
             };
-            console.log('page:', pageParams);
-            return new Promise((resolve) => resolve(segmentAnalytics.page(pageParams)));
+            return segmentAnalytics.page(pageParams);
         }),
         track: ({ Auth0Id, 
         //type = 'track',
@@ -52,7 +51,7 @@ const Analytics = (writeKey) => {
                 ? { userId: Auth0Id }
                 : { anonymousId: 'anonymous' };
             const trackParams = Object.assign({ event: event !== null && event !== void 0 ? event : 'no event specified', properties: Object.assign({}, properties) }, identifyParams);
-            return new Promise((resolve) => resolve(segmentAnalytics.track(trackParams)));
+            segmentAnalytics.track(trackParams);
         }),
     };
     return Object.assign({}, methods);

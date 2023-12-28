@@ -5,8 +5,6 @@ import {
   TrackParams,
 } from '@segment/analytics-node';
 
-//const analytics = AnalyticsBrowser.load({ writeKey: process.env.WRITE_KEY as string })
-
 export type EventType =
   | 'track'
   | 'page'
@@ -37,30 +35,22 @@ const Analytics = (writeKey: string) => {
       integrations,
     }: IdentifyParams) => {
       if (userId) {
-        return await new Promise((resolve) =>
-          resolve(
-            segmentAnalytics.identify({
-              userId,
-              traits,
-              context,
-              timestamp,
-              integrations,
-            }),
-          ),
-        );
+        return segmentAnalytics.identify({
+          userId,
+          traits,
+          context,
+          timestamp,
+          integrations,
+        });
       }
       if (anonymousId) {
-        return await new Promise((resolve) =>
-          resolve(
-            segmentAnalytics.identify({
-              anonymousId,
-              traits,
-              context,
-              timestamp,
-              integrations,
-            }),
-          ),
-        );
+        return segmentAnalytics.identify({
+          anonymousId,
+          traits,
+          context,
+          timestamp,
+          integrations,
+        });
       }
     },
     pageview: async ({
@@ -78,10 +68,7 @@ const Analytics = (writeKey: string) => {
         },
       };
 
-      console.log('page:', pageParams);
-      return new Promise((resolve) =>
-        resolve(segmentAnalytics.page(pageParams)),
-      );
+      return segmentAnalytics.page(pageParams);
     },
     track: async ({
       Auth0Id,
@@ -106,9 +93,7 @@ const Analytics = (writeKey: string) => {
         ...identifyParams,
       };
 
-      return new Promise((resolve) =>
-        resolve(segmentAnalytics.track(trackParams)),
-      );
+      segmentAnalytics.track(trackParams);
     },
   };
 

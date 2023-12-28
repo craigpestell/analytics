@@ -1,5 +1,5 @@
 import Analytics, { PageViewProps } from './lib/analytics';
 
-export { type PageViewProps };
+export { Analytics, type PageViewProps };
 
 export default Analytics;

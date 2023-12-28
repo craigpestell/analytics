@@ -23,7 +23,7 @@ export type PageViewProps = {
 };
 
 const Analytics = (writeKey: string) => {
-  const analytics = new SegmentAnalytics({
+  const segmentAnalytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);
 
@@ -39,7 +39,7 @@ const Analytics = (writeKey: string) => {
       if (userId) {
         return await new Promise((resolve) =>
           resolve(
-            analytics.identify({
+            segmentAnalytics.identify({
               userId,
               traits,
               context,
@@ -52,7 +52,7 @@ const Analytics = (writeKey: string) => {
       if (anonymousId) {
         return await new Promise((resolve) =>
           resolve(
-            analytics.identify({
+            segmentAnalytics.identify({
               anonymousId,
               traits,
               context,
@@ -69,19 +69,6 @@ const Analytics = (writeKey: string) => {
       name,
       properties,
     }: PageViewProps) => {
-      /*
-        {
-          userId: '019mr8mf4r',
-          category: 'Docs',
-          name: 'Node.js Library',
-          properties: {
-            url: 'https://segment.com/docs/connections/sources/catalog/librariesnode',
-            path: '/docs/connections/sources/catalog/librariesnode/',
-            title: 'Node.js Library - Segment',
-            referrer: 'https://github.com/segmentio/analytics-node'
-          }
-        }
-        */
       const pageParams: PageParams = {
         userId: Auth0Id,
         category,
@@ -92,8 +79,8 @@ const Analytics = (writeKey: string) => {
       };
 
       console.log('page:', pageParams);
-      return await new Promise((resolve) =>
-        resolve(analytics.page(pageParams)),
+      return new Promise((resolve) =>
+        resolve(segmentAnalytics.page(pageParams)),
       );
     },
     track: async ({
@@ -119,7 +106,9 @@ const Analytics = (writeKey: string) => {
         ...identifyParams,
       };
 
-      await new Promise((resolve) => resolve(analytics.track(trackParams)));
+      return new Promise((resolve) =>
+        resolve(segmentAnalytics.track(trackParams)),
+      );
     },
   };
 

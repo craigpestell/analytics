@@ -22,7 +22,7 @@ export type PageViewProps = {
   properties?: Object;
 };
 
-const HealthTapAnalytics = (writeKey: string) => {
+const Analytics = (writeKey: string) => {
   const segmentAnalytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);
@@ -37,30 +37,28 @@ const HealthTapAnalytics = (writeKey: string) => {
       integrations,
     }: IdentifyParams): Promise<void> => {
       if (userId) {
-        return new Promise((resolve) =>
-          resolve(
-            segmentAnalytics.identify({
-              userId,
-              traits,
-              context,
-              timestamp,
-              integrations,
-            }),
-          ),
-        );
+        return new Promise((resolve) => {
+          segmentAnalytics.identify({
+            userId,
+            traits,
+            context,
+            timestamp,
+            integrations,
+          });
+          resolve();
+        });
       }
       if (anonymousId) {
-        return new Promise((resolve) =>
-          resolve(
-            segmentAnalytics.identify({
-              anonymousId,
-              traits,
-              context,
-              timestamp,
-              integrations,
-            }),
-          ),
-        );
+        return new Promise((resolve) => {
+          segmentAnalytics.identify({
+            anonymousId,
+            traits,
+            context,
+            timestamp,
+            integrations,
+          });
+          resolve();
+        });
       }
       return new Promise((resolve) => {
         resolve();
@@ -81,9 +79,10 @@ const HealthTapAnalytics = (writeKey: string) => {
         },
       };
 
-      return new Promise((resolve) =>
-        resolve(segmentAnalytics.page(pageParams)),
-      );
+      return new Promise((resolve) => {
+        segmentAnalytics.page(pageParams);
+        resolve();
+      });
     },
     track: ({
       Auth0Id,
@@ -108,10 +107,11 @@ const HealthTapAnalytics = (writeKey: string) => {
         ...identifyParams,
       };
 
-      return new Promise((resolve) =>
-        resolve(segmentAnalytics.track(trackParams)),
-      );
+      return new Promise((resolve) => {
+        segmentAnalytics.track(trackParams);
+        resolve();
+      });
     },
   };
 };
-export default HealthTapAnalytics;
+export default Analytics;

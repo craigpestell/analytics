@@ -5,6 +5,8 @@ import {
   TrackParams,
 } from '@segment/analytics-node';
 
+//const analytics = AnalyticsBrowser.load({ writeKey: process.env.WRITE_KEY as string })
+
 export type EventType =
   | 'track'
   | 'page'
@@ -25,40 +27,51 @@ const Analytics = (writeKey: string) => {
     writeKey,
   }).on('error', console.error);
 
-  const methods = {
-    identify: async ({
+  return {
+    identify: ({
       userId,
       anonymousId,
       traits,
       context,
       timestamp,
       integrations,
-    }: IdentifyParams) => {
+    }: IdentifyParams): Promise<void> => {
       if (userId) {
-        return segmentAnalytics.identify({
-          userId,
-          traits,
-          context,
-          timestamp,
-          integrations,
-        });
+        return new Promise((resolve) =>
+          resolve(
+            segmentAnalytics.identify({
+              userId,
+              traits,
+              context,
+              timestamp,
+              integrations,
+            }),
+          ),
+        );
       }
       if (anonymousId) {
-        return segmentAnalytics.identify({
-          anonymousId,
-          traits,
-          context,
-          timestamp,
-          integrations,
-        });
+        return new Promise((resolve) =>
+          resolve(
+            segmentAnalytics.identify({
+              anonymousId,
+              traits,
+              context,
+              timestamp,
+              integrations,
+            }),
+          ),
+        );
       }
+      return new Promise((resolve) => {
+        resolve();
+      });
     },
-    pageview: async ({
+    pageview: ({
       Auth0Id,
       category,
       name,
       properties,
-    }: PageViewProps) => {
+    }: PageViewProps): Promise<void> => {
       const pageParams: PageParams = {
         userId: Auth0Id,
         category,
@@ -68,9 +81,11 @@ const Analytics = (writeKey: string) => {
         },
       };
 
-      return segmentAnalytics.page(pageParams);
+      return new Promise((resolve) =>
+        resolve(segmentAnalytics.page(pageParams)),
+      );
     },
-    track: async ({
+    track: ({
       Auth0Id,
       //type = 'track',
       event,
@@ -80,7 +95,7 @@ const Analytics = (writeKey: string) => {
       type?: EventType;
       event: string;
       properties?: Object;
-    }) => {
+    }): Promise<void> => {
       const identifyParams: IdentifyParams = Auth0Id
         ? { userId: Auth0Id }
         : { anonymousId: 'anonymous' };
@@ -93,10 +108,10 @@ const Analytics = (writeKey: string) => {
         ...identifyParams,
       };
 
-      segmentAnalytics.track(trackParams);
+      return new Promise((resolve) =>
+        resolve(segmentAnalytics.track(trackParams)),
+      );
     },
   };
-
-  return { ...methods };
 };
 export default Analytics;

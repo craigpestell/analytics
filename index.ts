@@ -1,5 +1,9 @@
-import Analytics, { PageViewProps } from './lib/analytics';
+import Analytics, {
+  PageViewProps,
+  type PageParams,
+  type TrackParams,
+} from './lib/analytics';
 
-export { Analytics, type PageViewProps };
+export { Analytics, type PageViewProps, type PageParams, type TrackParams };
 
 export default Analytics;

@@ -55,6 +55,7 @@ exports.default = (writeKey) => {
                 : { anonymousId: 'anonymous' };
             const trackParams = Object.assign({ event: event !== null && event !== void 0 ? event : 'no event specified', properties: Object.assign({}, properties) }, identifyParams);
             return new Promise((resolve) => {
+                console.log('track:', trackParams);
                 segmentAnalytics.track(trackParams);
                 resolve();
             });

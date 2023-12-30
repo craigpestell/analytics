@@ -19,7 +19,7 @@ export type PageViewProps = {
   Auth0Id: string;
   category: string;
   name: string;
-  properties?: Object;
+    properties?: Object;
 };
 
 export default (writeKey: string) => {
@@ -108,6 +108,7 @@ export default (writeKey: string) => {
       };
 
       return new Promise((resolve) => {
+        console.log('track:', trackParams)
         segmentAnalytics.track(trackParams);
         resolve();
       });

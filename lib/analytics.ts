@@ -22,7 +22,7 @@ export type PageViewProps = {
   properties?: Object;
 };
 
-export default (writeKey: string) => {
+const Analytics = (writeKey: string) => {
   const segmentAnalytics = new SegmentAnalytics({
     writeKey,
   }).on('error', console.error);
@@ -115,5 +115,7 @@ export default (writeKey: string) => {
     },
   };
 };
+
+export default Analytics;
 
 export { type PageParams, type TrackParams };

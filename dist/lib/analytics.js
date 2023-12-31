@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const analytics_node_1 = require("@segment/analytics-node");
-exports.default = (writeKey) => {
+const Analytics = (writeKey) => {
     const segmentAnalytics = new analytics_node_1.Analytics({
         writeKey,
     }).on('error', console.error);
@@ -62,4 +62,5 @@ exports.default = (writeKey) => {
         },
     };
 };
+exports.default = Analytics;
 //# sourceMappingURL=analytics.js.map

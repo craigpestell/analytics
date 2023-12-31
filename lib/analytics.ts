@@ -116,6 +116,5 @@ const Analytics = (writeKey: string) => {
   };
 };
 
+export { type PageParams, type TrackParams, Analytics };
 export default Analytics;
-
-export { type PageParams, type TrackParams };
